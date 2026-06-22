@@ -1,8 +1,8 @@
 const CACHE = 'hikari-v1';
 const FILES = [
-  '/hikari-books/',
-  '/hikari-books/index.html',
-  '/hikari-books/manifest.json'
+  '/hikari_books/',
+  '/hikari_books/index.html',
+  '/hikari_books/manifest.json'
 ];
 
 self.addEventListener('install', e => {
