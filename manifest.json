@@ -1,12 +1,10 @@
 {
   "name": "Hikari Books",
   "short_name": "Hikari",
-  "description": "Моя личная библиотека",
   "start_url": "/hikari_books/",
   "display": "standalone",
-  "background_color": "#f5eddb",
-  "theme_color": "#8b4a00",
-  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "icons/icon-192.png",
