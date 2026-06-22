@@ -1446,9 +1446,6 @@ document.getElementById('inp-epub-file').addEventListener('change', async functi
 // ══════════════════════════════════════════════════
 // PWA SERVICE WORKER
 // ══════════════════════════════════════════════════
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
-}
 
 // ══════════════════════════════════════════════════
 // GITHUB SYNC
@@ -1576,16 +1573,7 @@ function openGithubSettings() {
 initSortBar();
 renderLibrary();
 
-// Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('SW зарегистрирован'))
-      .catch(err => console.log('SW ошибка:', err));
-  });
-}
- 
-  // GitHub кнопки
+// GitHub кнопки
 document.getElementById('btn-github-settings').addEventListener('click', () => {
   document.getElementById('modal-settings').classList.remove('open');
   openGithubSettings();
@@ -1598,6 +1586,16 @@ document.getElementById('btn-github-load').addEventListener('click', () => {
   document.getElementById('modal-settings').classList.remove('open');
   githubSyncLoad();
 });
+
+// Service Worker (только один раз, в самом конце)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW зарегистрирован'))
+      .catch(err => console.log('SW ошибка:', err));
+  });
+}
+
 </script>
 </body>
 </html>
