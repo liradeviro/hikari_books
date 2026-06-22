@@ -2,7 +2,7 @@
   "name": "Hikari Books",
   "short_name": "Hikari",
   "description": "Моя личная библиотека",
-  "start_url": "/hikari-books/",
+  "start_url": "/hikari_books/",
   "display": "standalone",
   "background_color": "#f5eddb",
   "theme_color": "#8b4a00",
