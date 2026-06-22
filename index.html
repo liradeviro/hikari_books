@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f5eddb">
+<title>Читалочка</title>
+<style>
+  :root {
+    --bg: #f5eddb; --bg2: #ede0c4; --bg3: #e3d4b0;
+    --accent: #8b4a00; --accent2: #a05c10;
+    --text: #4e2e02; --text2: #7a5530;
+    --border: #c9b48a; --danger: #c0392b; --success: #2d7a4f;
+    --radius: 12px;
+    --font-body: 'Georgia', serif;
+    --font-ui: system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100dvh; overflow-x: hidden; }
+
+  .screen { display: none; flex-direction: column; min-height: 100dvh; }
+  .screen.active { display: flex; }
+
+  .topbar {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-title { font-size: 17px; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-icon {
+    background: none; border: none; color: var(--text); cursor: pointer;
+    width: 38px; height: 38px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .btn-icon:active { background: var(--bg3); }
+
+  .content { flex: 1; padding: 16px; overflow-y: auto; }
+
+  /* breadcrumb */
+  .breadcrumb {
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    padding: 10px 16px 0; font-size: 13px; color: var(--text2);
+  }
+  .breadcrumb span { cursor: pointer; }
+  .breadcrumb span:hover { color: var(--accent); }
+  .breadcrumb .sep { color: var(--border); }
+
+  .fab-group {
+    position: fixed; bottom: 24px; right: 20px;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 200;
+  }
+  .fab-mini {
+    background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text); font-size: 14px; padding: 8px 14px;
+    border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    transition: opacity .2s; opacity: 0; pointer-events: none;
+  }
+  .fab-mini.visible { opacity: 1; pointer-events: auto; }
+  .fab {
+    background: var(--accent); color: #fff;
+    width: 52px; height: 52px; border-radius: 50%; border: none;
+    font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(139,74,0,.3); transition: transform .15s;
+  }
+  .fab:active { transform: scale(.92); }
+
+  .section-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--text2); margin: 18px 0 8px;
+  }
+  .folder-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer; margin-bottom: 8px; transition: border-color .15s;
+  }
+  .folder-card:active { border-color: var(--accent2); }
+  .folder-icon { font-size: 22px; }
+  .folder-info { flex: 1; }
+  .folder-name { font-size: 16px; font-weight: 500; }
+  .folder-count { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .chevron { color: var(--text2); font-size: 16px; }
+
+  .file-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    cursor: pointer; margin-bottom: 8px;
+    display: flex; align-items: flex-start; gap: 12px; transition: border-color .15s;
+  }
+  .file-card:active { border-color: var(--accent); }
+  .file-icon { font-size: 20px; margin-top: 2px; }
+  .file-info { flex: 1; min-width: 0; }
+  .file-name { font-size: 16px; font-weight: 500; }
+  .file-author { font-size: 13px; color: var(--accent); margin-top: 2px; }
+  .file-desc { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+  .file-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .tag { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
+    z-index: 500; align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2); border-radius: 20px 20px 0 0;
+    border-top: 1px solid var(--border);
+    width: 100%; max-height: 92dvh; overflow-y: auto; padding: 20px 16px 36px;
+  }
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+  .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+
+  label { font-size: 13px; color: var(--text2); display: block; margin-bottom: 4px; }
+  .field { margin-bottom: 16px; }
+  input[type=text], textarea, select {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); font-size: 15px; padding: 11px 13px;
+    border-radius: 9px; outline: none; font-family: var(--font-ui); transition: border-color .15s;
+  }
+  input[type=text]:focus, textarea:focus, select:focus { border-color: var(--accent2); }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: var(--bg3); }
+
+  .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+  .btn:active { opacity: .8; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn + .btn { margin-top: 10px; }
+
+  .cover-header {
+    background: linear-gradient(160deg, #e8d5b0 0%, #f0e4c8 100%);
+    border-bottom: 1px solid var(--border); padding: 28px 20px 24px; text-align: center;
+  }
+  .cover-title { font-family: var(--font-body); font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .cover-author { color: var(--accent); font-size: 15px; margin-bottom: 12px; }
+  .cover-desc { color: var(--text2); font-size: 14px; line-height: 1.65; text-align: justify; text-indent: 1.5em; }
+  .cover-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 14px; }
+
+  .toc-section { padding: 20px 16px; }
+  .toc-title { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--text2); margin-bottom: 14px; }
+  .toc-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px; margin-bottom: 8px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); cursor: pointer; transition: border-color .15s;
+  }
+  .toc-item:active { border-color: var(--accent); }
+  .toc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--text2);
+  }
+  .toc-item-title { flex: 1; font-size: 15px; }
+
+  /* simple-text edit button on cover */
+  .cover-edit-btn {
+    display: block; margin: 20px 16px 0;
+    padding: 14px; background: var(--accent); color: #fff;
+    border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
+    cursor: pointer; text-align: center; width: calc(100% - 32px);
+  }
+  .cover-edit-btn:active { opacity: .8; }
+
+  .chapter-nav {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 7px 12px; display: flex; align-items: center; gap: 8px;
+    position: sticky; bottom: 0;
+  }
+  .nav-btn {
+    flex: 1; padding: 7px 6px; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; font-size: 14px;
+    cursor: pointer; text-align: center; transition: border-color .15s;
+  }
+  .nav-btn:active { border-color: var(--accent2); }
+  .nav-btn:disabled { opacity: .35; pointer-events: none; }
+  .nav-btn.center { flex: 0 0 36px; font-size: 18px; }
+
+  .chapter-body { flex: 1; padding: 20px 18px; font-family: var(--font-body); line-height: 1.75; overflow-y: auto; color: #111; text-align: justify; }
+  .chapter-body p { margin-bottom: 1em; }
+
+  .editor-toolbar {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 10px 12px; display: flex; gap: 6px; flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .tb-btn {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); padding: 6px 11px; border-radius: 7px;
+    font-size: 14px; cursor: pointer; white-space: nowrap;
+  }
+  .tb-btn:active { border-color: var(--accent); }
+  .tb-sep { width: 1px; background: var(--border); margin: 0 2px; align-self: stretch; }
+  .tb-select {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); padding: 5px 8px; border-radius: 7px; font-size: 14px; cursor: pointer;
+  }
+
+  #editor-area {
+    flex: 1; width: 100%; background: transparent; border: none; outline: none;
+    color: var(--text); font-size: 16px; line-height: 1.75; padding: 20px 18px;
+    font-family: var(--font-body); resize: none; min-height: 300px;
+  }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--text2); }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+  .empty-sub { font-size: 14px; }
+
+  .ctx-menu {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.2);
+    position: fixed; z-index: 600; min-width: 180px; display: none;
+  }
+  .ctx-menu.open { display: block; }
+  .ctx-item { padding: 13px 16px; font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+  .ctx-item:active { background: var(--bg3); }
+  .ctx-item.danger { color: var(--danger); }
+  .ctx-sep { height: 1px; background: var(--border); }
+
+  #toast {
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 18px; border-radius: 20px;
+    font-size: 14px; z-index: 1000; opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  hr.divider { border: none; border-top: 2px solid var(--border); margin: 18px 0; }
+  hr.divider-fancy { border: none; text-align: center; margin: 20px 0; }
+  hr.divider-fancy::after { content: '✦  ✦  ✦'; color: var(--text2); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- LIBRARY -->
+<div class="screen active" id="screen-library">
+  <div class="topbar">
+    <span class="topbar-title">📚 МоиТексты</span>
+    <button class="btn-icon" id="btn-search">🔍</button>
+    <button class="btn-icon" id="btn-settings">⚙️</button>
+  </div>
+  <div id="breadcrumb-bar" class="breadcrumb"></div>
+  <div class="content" id="library-content"></div>
+  <div class="fab-group" id="fab-library">
+    <button class="fab-mini" id="fab-new-subfolder">📁 Подпапка</button>
+    <button class="fab-mini" id="fab-new-folder">📁 Папка</button>
+    <button class="fab-mini" id="fab-new-file">📄 Текст</button>
+    <button class="fab" id="fab-toggle">＋</button>
+  </div>
+</div>
+
+<!-- COVER -->
+<div class="screen" id="screen-cover">
+  <div class="topbar">
+    <button class="btn-icon" id="btn-cover-back">←</button>
+    <span class="topbar-title" id="cover-topbar-title"></span>
+    <button class="btn-icon" id="btn-cover-edit">✏️</button>
+  </div>
+  <div id="cover-body" style="flex:1;overflow-y:auto;"></div>
+</div>
+
+<!-- CHAPTER -->
+<div class="screen" id="screen-chapter">
+  <div class="topbar">
+    <button class="btn-icon" id="btn-chapter-back">←</button>
+    <span class="topbar-title" id="chapter-topbar-title"></span>
+    <button class="btn-icon" id="btn-chapter-edit">✏️</button>
+  </div>
+  <div class="chapter-body" id="chapter-body"></div>
+  <div class="chapter-nav">
+    <button class="nav-btn" id="nav-prev">← Пред.</button>
+    <button class="nav-btn center" id="nav-toc">☰</button>
+    <button class="nav-btn" id="nav-next">След. →</button>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div class="screen" id="screen-editor">
+  <div class="topbar">
+    <button class="btn-icon" id="btn-editor-cancel">✕</button>
+    <span class="topbar-title" id="editor-title">Редактор</span>
+    <button class="btn-icon" id="btn-editor-save">💾</button>
+  </div>
+  <div class="editor-toolbar">
+    <button class="tb-btn" id="tb-bold"><b>Ж</b></button>
+    <button class="tb-btn" id="tb-italic"><i>К</i></button>
+    <button class="tb-btn" id="tb-under">У̲</button>
+    <div class="tb-sep"></div>
+    <select class="tb-select" id="tb-font">
+      <option value="Georgia,serif">Georgia</option>
+      <option value="'Times New Roman',serif">Times</option>
+      <option value="system-ui,sans-serif">Sans</option>
+      <option value="'Courier New',monospace">Mono</option>
+    </select>
+    <select class="tb-select" id="tb-size">
+      <option value="14">14</option>
+      <option value="16" selected>16</option>
+      <option value="18">18</option>
+      <option value="20">20</option>
+      <option value="22">22</option>
+      <option value="24">24</option>
+    </select>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" id="tb-div-line">─</button>
+    <button class="tb-btn" id="tb-div-stars">✦✦✦</button>
+    <button class="tb-btn" id="tb-h1">H1</button>
+    <button class="tb-btn" id="tb-h2">H2</button>
+  </div>
+  <textarea id="editor-area" placeholder="Начните писать..."></textarea>
+</div>
+
+<!-- MODAL: FOLDER -->
+<div class="modal-overlay" id="modal-folder">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-folder-title">Новая папка</div>
+    <div class="field">
+      <label>Название папки</label>
+      <input type="text" id="inp-folder-name" placeholder="Например: Фанфики, Черновики…">
+    </div>
+    <div class="field">
+      <label>Иконка</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;" id="folder-emoji-picker">
+        <span style="font-size:24px;cursor:pointer;" data-em="📁">📁</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="📚">📚</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="🗂️">🗂️</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="💜">💜</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="⭐">⭐</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="🌙">🌙</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="🌸">🌸</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="🔥">🔥</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="✨">✨</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="🎭">🎭</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="📖">📖</span>
+        <span style="font-size:24px;cursor:pointer;" data-em="🖊️">🖊️</span>
+      </div>
+      <input type="text" id="inp-folder-icon" placeholder="Или введите любой эмодзи" style="margin-top:8px;">
+    </div>
+    <button class="btn btn-primary" id="btn-folder-save">Сохранить</button>
+    <button class="btn btn-secondary" id="btn-folder-cancel">Отмена</button>
+    <button class="btn btn-danger" id="btn-folder-delete" style="display:none;margin-top:14px;">Удалить папку</button>
+  </div>
+</div>
+
+<!-- MODAL: FILE -->
+<div class="modal-overlay" id="modal-file">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-file-title">Новый текст</div>
+    <div class="field">
+      <label>Название *</label>
+      <input type="text" id="inp-file-name" placeholder="Название произведения">
+    </div>
+    <div class="field">
+      <label>Автор</label>
+      <input type="text" id="inp-file-author" placeholder="Имя автора">
+    </div>
+    <div class="field">
+      <label>Краткое описание</label>
+      <textarea id="inp-file-desc" placeholder="О чём этот текст…" style="min-height:70px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Метки (через запятую)</label>
+      <input type="text" id="inp-file-tags" placeholder="романтика, драма, AU…">
+    </div>
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="inp-file-simple" style="width:18px;height:18px;accent-color:var(--accent);">
+        <span style="font-size:15px;color:var(--text);">Простой текст (без глав)</span>
+      </label>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px;padding-left:28px;">На странице обложки будет кнопка «Редактировать текст»</div>
+    </div>
+    <button class="btn btn-primary" id="btn-file-save">Сохранить</button>
+    <button class="btn btn-secondary" id="btn-file-cancel">Отмена</button>
+    <button class="btn btn-danger" id="btn-file-delete" style="display:none;margin-top:14px;">Удалить текст</button>
+  </div>
+</div>
+
+<!-- MODAL: CHAPTER -->
+<div class="modal-overlay" id="modal-chapter">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-chapter-title">Новая глава</div>
+    <div class="field">
+      <label>Название главы *</label>
+      <input type="text" id="inp-chapter-name" placeholder="Название главы">
+    </div>
+    <button class="btn btn-primary" id="btn-chapter-save">Открыть редактор</button>
+    <button class="btn btn-secondary" id="btn-chapter-cancel">Отмена</button>
+    <button class="btn btn-danger" id="btn-chapter-delete" style="display:none;margin-top:14px;">Удалить главу</button>
+  </div>
+</div>
+
+<!-- MODAL: SETTINGS -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ Настройки</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Резервная копия</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.6;color:var(--text2);">
+      Экспорт сохраняет <b style="color:var(--text)">все папки, тексты и главы</b> в файл <code style="background:var(--bg2);padding:1px 5px;border-radius:4px;">.json</code>.
+    </div>
+    <button class="btn btn-primary" id="btn-export">⬇️ Экспортировать данные</button>
+    <div style="font-size:12px;color:var(--text2);margin:6px 0 16px;text-align:center;">Файл сохранится в папку «Загрузки»</div>
+    <button class="btn btn-secondary" id="btn-import">⬆️ Восстановить из файла</button>
+    <input type="file" id="inp-import-file" accept=".json" style="display:none;">
+    <div style="font-size:12px;color:var(--text2);margin:6px 0 0;text-align:center;">Внимание: заменит все текущие данные</div>
+    <div style="border-top:1px solid var(--border);margin:20px 0 16px;"></div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Импорт EPUB</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.6;color:var(--text2);">
+      Главы сохранятся автоматически. Шапку (название, автор, описание) заполните вручную после импорта. При первом импорте нужен интернет.
+    </div>
+    <button class="btn btn-secondary" id="btn-epub-import">📖 Импортировать EPUB</button>
+    <input type="file" id="inp-epub-file" accept=".epub" style="display:none;">
+    <div id="epub-status" style="font-size:13px;color:var(--text2);margin-top:8px;text-align:center;min-height:18px;"></div>
+    <div style="border-top:1px solid var(--border);margin:20px 0 16px;"></div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Syncthing</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.6;color:var(--text2);">
+      Сделайте Экспорт в папку Syncthing. На другом устройстве — Импорт из той же папки.
+    </div>
+    <div style="border-top:1px solid var(--border);margin:20px 0 16px;"></div>
+    <button class="btn btn-danger" id="btn-clear-all">🗑 Удалить все данные</button>
+    <button class="btn btn-secondary" id="btn-settings-close" style="margin-top:10px;">Закрыть</button>
+  </div>
+</div>
+
+<!-- CTX MENU -->
+<div class="ctx-menu" id="ctx-toc">
+  <div class="ctx-item" id="ctx-toc-edit">✏️ Переименовать</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" id="ctx-toc-delete">🗑 Удалить главу</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+const STORE_KEY = 'mytexts_v1';
+function defaultData() { return { folders: [], files: [] }; }
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || defaultData(); }
+  catch { return defaultData(); }
+}
+function saveData() { localStorage.setItem(STORE_KEY, JSON.stringify(DATA)); }
+let DATA = loadData();
+
+// ── STATE ──
+// folderStack: array of folderIds, empty = root
+let state = {
+  folderStack: [],       // navigation breadcrumb stack
+  currentFileId: null,
+  currentChapterIdx: null,
+  editingFolderId: null,
+  editingFileId: null,
+  editingChapterId: null,
+  fabOpen: false,
+  ctxTarget: null,
+};
+
+// current folder id (top of stack, or null = root)
+function currentFolderId() { return state.folderStack.length ? state.folderStack[state.folderStack.length-1] : null; }
+
+// ── UTILS ──
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function plural(n,a,b,c) {
+  const m=n%100; if(m>=11&&m<=19) return c;
+  const r=n%10; if(r===1) return a; if(r>=2&&r<=4) return b; return c;
+}
+function closeFab() {
+  state.fabOpen = false;
+  document.getElementById('fab-toggle').textContent = '＋';
+  ['fab-new-folder','fab-new-file','fab-new-subfolder'].forEach(id => {
+    document.getElementById(id).classList.remove('visible');
+  });
+}
+
+// ── FOLDER HELPERS ──
+function getFolderPath(folderId) {
+  // returns array of folder objects from root to folderId
+  const path = [];
+  let id = folderId;
+  while (id) {
+    const f = DATA.folders.find(x => x.id === id);
+    if (!f) break;
+    path.unshift(f);
+    id = f.parentId || null;
+  }
+  return path;
+}
+
+// ══════════════════════════════════════════════════
+// RENDER LIBRARY
+// ══════════════════════════════════════════════════
+function renderLibrary() {
+  showScreen('library');
+  closeFab();
+  const fid = currentFolderId();
+
+  // breadcrumb
+  const bc = document.getElementById('breadcrumb-bar');
+  const path = fid ? getFolderPath(fid) : [];
+  if (path.length === 0) {
+    bc.innerHTML = '';
+  } else {
+    let html = `<span data-gotoroot="1">🏠 МоиТексты</span>`;
+    path.forEach((f, i) => {
+      html += `<span class="sep"> › </span>`;
+      if (i < path.length - 1) {
+        html += `<span data-gotofolder="${f.id}">${esc(f.name)}</span>`;
+      } else {
+        html += `<span style="color:var(--text);font-weight:600;">${esc(f.name)}</span>`;
+      }
+    });
+    bc.innerHTML = html;
+    bc.querySelectorAll('[data-gotoroot]').forEach(el => el.addEventListener('click', () => { state.folderStack = []; renderLibrary(); }));
+    bc.querySelectorAll('[data-gotofolder]').forEach(el => el.addEventListener('click', () => {
+      const idx = state.folderStack.indexOf(el.dataset.gotofolder);
+      if (idx !== -1) state.folderStack = state.folderStack.slice(0, idx+1);
+      renderLibrary();
+    }));
+  }
+
+  // update topbar
+  const currentFolder = fid ? DATA.folders.find(f => f.id === fid) : null;
+  document.querySelector('#screen-library .topbar-title').textContent =
+    currentFolder ? (currentFolder.icon||'📁') + ' ' + currentFolder.name : '📚 МоиТексты';
+
+  // subfolder fab: show only when inside a folder
+  const subfab = document.getElementById('fab-new-subfolder');
+  subfab.style.display = fid ? 'flex' : 'none';
+
+  // back button in topbar (show when inside folder)
+  let backBtn = document.getElementById('btn-lib-back');
+  if (!backBtn) {
+    backBtn = document.createElement('button');
+    backBtn.className = 'btn-icon';
+    backBtn.id = 'btn-lib-back';
+    backBtn.textContent = '←';
+    backBtn.addEventListener('click', () => { state.folderStack.pop(); renderLibrary(); });
+    document.querySelector('#screen-library .topbar').prepend(backBtn);
+  }
+  backBtn.style.display = fid ? 'flex' : 'none';
+
+  const cont = document.getElementById('library-content');
+  const childFolders = DATA.folders.filter(f => (f.parentId || null) === fid);
+  const childFiles   = DATA.files.filter(f   => (f.folderId || null) === fid);
+  const html = [];
+
+  if (childFolders.length === 0 && childFiles.length === 0) {
+    html.push(`<div class="empty">
+      <div class="empty-icon">${fid ? '📂' : '📖'}</div>
+      <div class="empty-title">${fid ? 'Папка пуста' : 'Библиотека пуста'}</div>
+      <div class="empty-sub">Нажмите + чтобы добавить</div>
+    </div>`);
+  } else {
+    if (childFolders.length > 0) {
+      html.push('<div class="section-label">Папки</div>');
+      childFolders.forEach(f => {
+        const subFolderCount = DATA.folders.filter(x => x.parentId === f.id).length;
+        const fileCount = DATA.files.filter(x => x.folderId === f.id).length;
+        const total = subFolderCount + fileCount;
+        html.push(`<div class="folder-card" data-id="${f.id}">
+          <span class="folder-icon">${f.icon||'📁'}</span>
+          <div class="folder-info">
+            <div class="folder-name">${esc(f.name)}</div>
+            <div class="folder-count">${total} элем.</div>
+          </div>
+          <span class="chevron">›</span>
+        </div>`);
+      });
+    }
+    if (childFiles.length > 0) {
+      html.push('<div class="section-label">Тексты</div>');
+      childFiles.forEach(f => html.push(fileCardHtml(f)));
+    }
+  }
+  cont.innerHTML = html.join('');
+
+  cont.querySelectorAll('.folder-card').forEach(el => {
+    el.addEventListener('click', () => { state.folderStack.push(el.dataset.id); renderLibrary(); });
+    el.addEventListener('contextmenu', e => { e.preventDefault(); openFolderModal(el.dataset.id); });
+  });
+  cont.querySelectorAll('.file-card').forEach(el => {
+    el.addEventListener('click', () => { state.currentFileId = el.dataset.id; renderCover(); });
+    el.addEventListener('contextmenu', e => { e.preventDefault(); openFileModal(el.dataset.id); });
+  });
+}
+
+function fileCardHtml(f) {
+  const tags = (f.tags||[]).slice(0,4).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  const modeIcon = f.simple ? '📝' : '📄';
+  return `<div class="file-card" data-id="${f.id}">
+    <span class="file-icon">${modeIcon}</span>
+    <div class="file-info">
+      <div class="file-name">${esc(f.name)}</div>
+      ${f.author?`<div class="file-author">${esc(f.author)}</div>`:''}
+      ${f.desc?`<div class="file-desc">${esc(f.desc)}</div>`:''}
+      ${tags?`<div class="file-tags">${tags}</div>`:''}
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// RENDER COVER
+// ══════════════════════════════════════════════════
+function renderCover() {
+  showScreen('cover');
+  const file = DATA.files.find(f => f.id === state.currentFileId);
+  if (!file) return;
+  document.getElementById('cover-topbar-title').textContent = file.name;
+
+  const tags = (file.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  const header = `
+    <div class="cover-header">
+      <div class="cover-title">${esc(file.name)}</div>
+      ${file.author?`<div class="cover-author">${esc(file.author)}</div>`:''}
+      ${file.desc?`<div class="cover-desc">${esc(file.desc)}</div>`:''}
+      ${tags?`<div class="cover-tags">${tags}</div>`:''}
+    </div>`;
+
+  if (file.simple) {
+    // Simple text mode — just a big edit button
+    document.getElementById('cover-body').innerHTML = header + `
+      <button class="cover-edit-btn" id="cover-simple-edit">✏️ Редактировать текст</button>
+      ${file.simpleContent ? `
+        <div style="padding:20px 18px;font-family:var(--font-body);font-size:16px;line-height:1.75;color:#111;text-align:justify;">
+          ${renderContent(file.simpleContent)}
+        </div>` : ''}`;
+    document.getElementById('cover-simple-edit').addEventListener('click', () => openSimpleEditor(file.id));
+  } else {
+    // Chapters mode
+    const chapters = file.chapters || [];
+    const tocItems = chapters.map((ch,i) => `
+      <div class="toc-item" data-idx="${i}">
+        <div class="toc-num">${i+1}</div>
+        <div class="toc-item-title">${esc(ch.name)}</div>
+        <span style="color:var(--text2);font-size:14px;">›</span>
+      </div>`).join('');
+
+    document.getElementById('cover-body').innerHTML = header + `
+      <div class="toc-section">
+        <div class="toc-title">Оглавление · ${chapters.length} ${plural(chapters.length,'глава','главы','глав')}</div>
+        ${chapters.length === 0
+          ? `<div class="empty" style="padding:30px 0">
+               <div class="empty-icon" style="font-size:36px;">📝</div>
+               <div class="empty-title" style="font-size:16px;">Нет глав</div>
+               <div class="empty-sub">Нажмите ✏️ чтобы добавить первую главу</div>
+             </div>`
+          : tocItems}
+      </div>`;
+
+    document.querySelectorAll('.toc-item').forEach(el => {
+      el.addEventListener('click', () => openChapter(parseInt(el.dataset.idx)));
+      el.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        state.ctxTarget = parseInt(el.dataset.idx);
+        showCtx('ctx-toc', e.clientX, e.clientY);
+      });
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════
+// CHAPTER
+// ══════════════════════════════════════════════════
+function openChapter(idx) {
+  const file = DATA.files.find(f => f.id === state.currentFileId);
+  if (!file || !file.chapters[idx]) return;
+  state.currentChapterIdx = idx;
+  showScreen('chapter');
+  const ch = file.chapters[idx];
+  document.getElementById('chapter-topbar-title').textContent = ch.name;
+  document.getElementById('chapter-body').innerHTML = renderContent(ch.content || '');
+  document.getElementById('nav-prev').disabled = idx === 0;
+  document.getElementById('nav-next').disabled = idx === file.chapters.length - 1;
+}
+
+function renderContent(text) {
+  return text.split('\n').map(line => {
+    if (line.startsWith('# ')) return `<h1 style="font-size:1.5em;margin-bottom:.5em;">${esc(line.slice(2))}</h1>`;
+    if (line.startsWith('## ')) return `<h2 style="font-size:1.2em;margin-bottom:.5em;">${esc(line.slice(3))}</h2>`;
+    if (line === '---') return '<hr class="divider">';
+    if (line === '***') return '<hr class="divider-fancy">';
+    if (line.trim() === '') return '';
+    return `<p>${esc(line).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/__(.+?)__/g,'<u>$1</u>')}</p>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// EDITOR
+// ══════════════════════════════════════════════════
+let editorMode = null; // 'chapter' | 'simple'
+
+function openChapterEditor(fileId, chapterIdx) {
+  state.editingChapterId = { fileId, chapterIdx };
+  editorMode = 'chapter';
+  const file = DATA.files.find(f => f.id === fileId);
+  const ch = (file.chapters||[])[chapterIdx];
+  document.getElementById('editor-title').textContent = ch ? 'Редактировать главу' : 'Новая глава';
+  document.getElementById('editor-area').value = ch ? (ch.content||'') : '';
+  showScreen('editor');
+}
+
+function openSimpleEditor(fileId) {
+  state.editingChapterId = { fileId, chapterIdx: -1 };
+  editorMode = 'simple';
+  const file = DATA.files.find(f => f.id === fileId);
+  document.getElementById('editor-title').textContent = 'Редактировать текст';
+  document.getElementById('editor-area').value = file.simpleContent || '';
+  showScreen('editor');
+}
+
+function insertAtCursor(ta, before, after='') {
+  const s=ta.selectionStart, e=ta.selectionEnd, sel=ta.value.slice(s,e);
+  ta.value = ta.value.slice(0,s)+before+sel+after+ta.value.slice(e);
+  ta.selectionStart = s+before.length;
+  ta.selectionEnd = s+before.length+sel.length;
+  ta.focus();
+}
+
+document.getElementById('tb-bold').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'**','**'));
+document.getElementById('tb-italic').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'*','*'));
+document.getElementById('tb-under').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'__','__'));
+document.getElementById('tb-div-line').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'\n---\n'));
+document.getElementById('tb-div-stars').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'\n***\n'));
+document.getElementById('tb-h1').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'# '));
+document.getElementById('tb-h2').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'## '));
+document.getElementById('tb-font').addEventListener('change',function(){document.getElementById('editor-area').style.fontFamily=this.value;});
+document.getElementById('tb-size').addEventListener('change',function(){document.getElementById('editor-area').style.fontSize=this.value+'px';});
+
+document.getElementById('btn-editor-save').addEventListener('click', () => {
+  const content = document.getElementById('editor-area').value;
+  const { fileId, chapterIdx } = state.editingChapterId;
+  const file = DATA.files.find(f => f.id === fileId);
+  if (editorMode === 'simple') {
+    file.simpleContent = content;
+  } else {
+    if (!file.chapters) file.chapters = [];
+    file.chapters[chapterIdx].content = content;
+  }
+  saveData();
+  toast('Сохранено ✓');
+  state.currentFileId = fileId;
+  renderCover();
+});
+
+document.getElementById('btn-editor-cancel').addEventListener('click', () => {
+  if (state.currentFileId) renderCover();
+  else renderLibrary();
+});
+
+// ══════════════════════════════════════════════════
+// MODAL: FOLDER
+// ══════════════════════════════════════════════════
+let selectedFolderIcon = '📁';
+
+function openFolderModal(folderId=null) {
+  state.editingFolderId = folderId;
+  const folder = folderId ? DATA.folders.find(f=>f.id===folderId) : null;
+  document.getElementById('modal-folder-title').textContent = folder ? 'Редактировать папку' : 'Новая папка';
+  document.getElementById('inp-folder-name').value = folder ? folder.name : '';
+  selectedFolderIcon = folder ? (folder.icon||'📁') : '📁';
+  document.getElementById('inp-folder-icon').value = folder ? (folder.icon||'') : '';
+  document.getElementById('btn-folder-delete').style.display = folderId ? 'block' : 'none';
+  document.getElementById('modal-folder').classList.add('open');
+}
+
+document.getElementById('folder-emoji-picker').querySelectorAll('span').forEach(s => {
+  s.addEventListener('click', () => { selectedFolderIcon = s.dataset.em; document.getElementById('inp-folder-icon').value = s.dataset.em; });
+});
+
+document.getElementById('btn-folder-save').addEventListener('click', () => {
+  const name = document.getElementById('inp-folder-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const icon = document.getElementById('inp-folder-icon').value.trim() || selectedFolderIcon;
+  if (state.editingFolderId) {
+    const f = DATA.folders.find(x=>x.id===state.editingFolderId);
+    f.name = name; f.icon = icon;
+    toast('Папка обновлена');
+  } else {
+    DATA.folders.push({ id: uid(), name, icon, parentId: currentFolderId() });
+    toast('Папка создана');
+  }
+  saveData();
+  document.getElementById('modal-folder').classList.remove('open');
+  renderLibrary();
+});
+
+document.getElementById('btn-folder-delete').addEventListener('click', () => {
+  if (!confirm('Удалить папку и всё её содержимое?')) return;
+  // recursively delete
+  function deleteFolderRec(id) {
+    DATA.folders.filter(f=>f.parentId===id).forEach(f=>deleteFolderRec(f.id));
+    DATA.files = DATA.files.filter(f=>f.folderId!==id);
+    DATA.folders = DATA.folders.filter(f=>f.id!==id);
+  }
+  deleteFolderRec(state.editingFolderId);
+  saveData();
+  document.getElementById('modal-folder').classList.remove('open');
+  // if we were inside the deleted folder, go up
+  const idx = state.folderStack.indexOf(state.editingFolderId);
+  if (idx !== -1) state.folderStack = state.folderStack.slice(0, idx);
+  renderLibrary();
+  toast('Папка удалена');
+});
+
+document.getElementById('btn-folder-cancel').addEventListener('click', () => {
+  document.getElementById('modal-folder').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════
+// MODAL: FILE
+// ══════════════════════════════════════════════════
+function openFileModal(fileId=null) {
+  state.editingFileId = fileId;
+  const file = fileId ? DATA.files.find(f=>f.id===fileId) : null;
+  document.getElementById('modal-file-title').textContent = file ? 'Редактировать текст' : 'Новый текст';
+  document.getElementById('inp-file-name').value = file ? file.name : '';
+  document.getElementById('inp-file-author').value = file ? (file.author||'') : '';
+  document.getElementById('inp-file-desc').value = file ? (file.desc||'') : '';
+  document.getElementById('inp-file-tags').value = file ? (file.tags||[]).join(', ') : '';
+  document.getElementById('inp-file-simple').checked = file ? !!file.simple : false;
+  document.getElementById('btn-file-delete').style.display = fileId ? 'block' : 'none';
+  document.getElementById('modal-file').classList.add('open');
+}
+
+document.getElementById('btn-file-save').addEventListener('click', () => {
+  const name = document.getElementById('inp-file-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const author = document.getElementById('inp-file-author').value.trim();
+  const desc = document.getElementById('inp-file-desc').value.trim();
+  const tags = document.getElementById('inp-file-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const simple = document.getElementById('inp-file-simple').checked;
+
+  if (state.editingFileId) {
+    const f = DATA.files.find(x=>x.id===state.editingFileId);
+    f.name=name; f.author=author; f.desc=desc; f.tags=tags; f.simple=simple;
+    saveData();
+    document.getElementById('modal-file').classList.remove('open');
+    if (state.currentFileId===state.editingFileId) renderCover();
+    else renderLibrary();
+    toast('Текст обновлён');
+  } else {
+    DATA.files.push({ id:uid(), name, author, desc, tags, simple, chapters:[], simpleContent:'', folderId: currentFolderId() });
+    saveData();
+    document.getElementById('modal-file').classList.remove('open');
+    renderLibrary();
+    toast('Текст создан');
+  }
+});
+
+document.getElementById('btn-file-delete').addEventListener('click', () => {
+  if (!confirm('Удалить этот текст?')) return;
+  DATA.files = DATA.files.filter(f=>f.id!==state.editingFileId);
+  saveData();
+  document.getElementById('modal-file').classList.remove('open');
+  renderLibrary();
+  toast('Текст удалён');
+});
+
+document.getElementById('btn-file-cancel').addEventListener('click', () => {
+  document.getElementById('modal-file').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════
+// MODAL: CHAPTER
+// ══════════════════════════════════════════════════
+function openChapterModal(fileId, chapterIdx=-1) {
+  const file = DATA.files.find(f=>f.id===fileId);
+  const ch = chapterIdx===-1 ? null : (file.chapters||[])[chapterIdx];
+  state.editingChapterId = { fileId, chapterIdx };
+  document.getElementById('modal-chapter-title').textContent = ch ? 'Редактировать главу' : 'Новая глава';
+  document.getElementById('inp-chapter-name').value = ch ? ch.name : '';
+  document.getElementById('btn-chapter-delete').style.display = chapterIdx!==-1 ? 'block' : 'none';
+  document.getElementById('modal-chapter').classList.add('open');
+}
+
+document.getElementById('btn-chapter-save').addEventListener('click', () => {
+  const name = document.getElementById('inp-chapter-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const { fileId, chapterIdx } = state.editingChapterId;
+  const file = DATA.files.find(f=>f.id===fileId);
+  if (!file.chapters) file.chapters=[];
+  let targetIdx;
+  if (chapterIdx===-1) { file.chapters.push({ id:uid(), name, content:'' }); targetIdx=file.chapters.length-1; }
+  else { file.chapters[chapterIdx].name=name; targetIdx=chapterIdx; }
+  saveData();
+  document.getElementById('modal-chapter').classList.remove('open');
+  openChapterEditor(fileId, targetIdx);
+});
+
+document.getElementById('btn-chapter-delete').addEventListener('click', () => {
+  if (!confirm('Удалить эту главу?')) return;
+  const { fileId, chapterIdx } = state.editingChapterId;
+  const file = DATA.files.find(f=>f.id===fileId);
+  file.chapters.splice(chapterIdx, 1);
+  saveData();
+  document.getElementById('modal-chapter').classList.remove('open');
+  renderCover();
+  toast('Глава удалена');
+});
+
+document.getElementById('btn-chapter-cancel').addEventListener('click', () => {
+  document.getElementById('modal-chapter').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════
+// CONTEXT MENU
+// ══════════════════════════════════════════════════
+function showCtx(id, x, y) {
+  closeAllCtx();
+  const el = document.getElementById(id);
+  el.style.left = Math.min(x, window.innerWidth-200)+'px';
+  el.style.top = Math.min(y, window.innerHeight-120)+'px';
+  el.classList.add('open');
+}
+function closeAllCtx() { document.querySelectorAll('.ctx-menu').forEach(e=>e.classList.remove('open')); }
+document.addEventListener('click', ()=>closeAllCtx());
+
+document.getElementById('ctx-toc-edit').addEventListener('click', () => { closeAllCtx(); openChapterModal(state.currentFileId, state.ctxTarget); });
+document.getElementById('ctx-toc-delete').addEventListener('click', () => {
+  closeAllCtx();
+  if (!confirm('Удалить главу?')) return;
+  const file = DATA.files.find(f=>f.id===state.currentFileId);
+  file.chapters.splice(state.ctxTarget, 1);
+  saveData(); renderCover(); toast('Глава удалена');
+});
+
+// ══════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════
+document.getElementById('btn-cover-back').addEventListener('click', () => renderLibrary());
+
+document.getElementById('btn-cover-edit').addEventListener('click', () => {
+  const fileId = state.currentFileId;
+  const file = DATA.files.find(f=>f.id===fileId);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:700;display:flex;align-items:flex-end;';
+  const items = file.simple
+    ? `<div class="ctx-item" id="_edit-simple" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">✏️ Редактировать текст</div>`
+    : `<div class="ctx-item" id="_add-ch" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">➕ Добавить главу</div>`;
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 36px;border-top:1px solid var(--border);">
+    <div style="font-size:16px;font-weight:600;margin-bottom:16px;">Действия</div>
+    <div class="ctx-item" id="_edit-meta" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">✏️ Редактировать шапку</div>
+    ${items}
+    <div class="ctx-item" id="_move-file" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">📂 Переместить в папку</div>
+    <div class="ctx-item danger" id="_del-file" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">🗑 Удалить текст</div>
+    <div class="ctx-item" id="_cancel" style="border-radius:10px;background:var(--bg3);color:var(--text2);">Отмена</div>
+  </div>`;
+  document.body.appendChild(overlay);
+  const rm = () => document.body.removeChild(overlay);
+  overlay.querySelector('#_edit-meta').onclick = () => { rm(); openFileModal(fileId); };
+  const addCh = overlay.querySelector('#_add-ch');
+  if (addCh) addCh.onclick = () => { rm(); openChapterModal(fileId); };
+  const editSimple = overlay.querySelector('#_edit-simple');
+  if (editSimple) editSimple.onclick = () => { rm(); openSimpleEditor(fileId); };
+  overlay.querySelector('#_move-file').onclick = () => { rm(); openMoveFileModal(fileId); };
+  overlay.querySelector('#_del-file').onclick = () => {
+    rm();
+    if (!confirm('Удалить этот текст?')) return;
+    DATA.files = DATA.files.filter(f=>f.id!==fileId);
+    saveData(); renderLibrary(); toast('Текст удалён');
+  };
+  overlay.querySelector('#_cancel').onclick = rm;
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) rm(); });
+});
+
+document.getElementById('btn-chapter-back').addEventListener('click', ()=>renderCover());
+document.getElementById('btn-chapter-edit').addEventListener('click', ()=>openChapterModal(state.currentFileId, state.currentChapterIdx));
+document.getElementById('nav-prev').addEventListener('click', ()=>{ if(state.currentChapterIdx>0) openChapter(state.currentChapterIdx-1); });
+document.getElementById('nav-next').addEventListener('click', ()=>{
+  const file=DATA.files.find(f=>f.id===state.currentFileId);
+  if(state.currentChapterIdx<file.chapters.length-1) openChapter(state.currentChapterIdx+1);
+});
+document.getElementById('nav-toc').addEventListener('click', ()=>renderCover());
+
+// ══════════════════════════════════════════════════
+// FAB
+// ══════════════════════════════════════════════════
+document.getElementById('fab-toggle').addEventListener('click', () => {
+  state.fabOpen = !state.fabOpen;
+  document.getElementById('fab-toggle').textContent = state.fabOpen ? '✕' : '＋';
+  const fid = currentFolderId();
+  document.getElementById('fab-new-subfolder').classList.toggle('visible', state.fabOpen && !!fid);
+  document.getElementById('fab-new-folder').classList.toggle('visible', state.fabOpen);
+  document.getElementById('fab-new-file').classList.toggle('visible', state.fabOpen);
+});
+
+document.getElementById('fab-new-folder').addEventListener('click', () => { closeFab(); openFolderModal(); });
+document.getElementById('fab-new-subfolder').addEventListener('click', () => { closeFab(); openFolderModal(); }); // parentId set via currentFolderId()
+document.getElementById('fab-new-file').addEventListener('click', () => { closeFab(); openFileModal(); });
+
+// ══════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════
+document.getElementById('btn-search').addEventListener('click', () => {
+  const q = prompt('Поиск по названию, автору, меткам:');
+  if (!q) return;
+  const low = q.toLowerCase();
+  const results = DATA.files.filter(f =>
+    f.name.toLowerCase().includes(low) ||
+    (f.author||'').toLowerCase().includes(low) ||
+    (f.tags||[]).some(t=>t.toLowerCase().includes(low))
+  );
+  if (results.length === 0) { toast('Ничего не найдено'); return; }
+  const cont = document.getElementById('library-content');
+  document.getElementById('breadcrumb-bar').innerHTML = `<span>Результаты поиска: «${esc(q)}»</span>`;
+  showScreen('library');
+  cont.innerHTML = results.map(f=>fileCardHtml(f)).join('');
+  cont.querySelectorAll('.file-card').forEach(el => {
+    el.addEventListener('click', ()=>{ state.currentFileId=el.dataset.id; renderCover(); });
+  });
+});
+
+// ══════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════
+document.getElementById('btn-settings').addEventListener('click', ()=>document.getElementById('modal-settings').classList.add('open'));
+document.getElementById('btn-settings-close').addEventListener('click', ()=>document.getElementById('modal-settings').classList.remove('open'));
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(DATA,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const now = new Date();
+  const stamp = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  const a = document.createElement('a');
+  a.href=url; a.download='МоиТексты_'+stamp+'.json'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Файл сохранён в Загрузки ✓');
+});
+
+document.getElementById('btn-import').addEventListener('click', ()=>document.getElementById('inp-import-file').click());
+document.getElementById('inp-import-file').addEventListener('change', function() {
+  const file = this.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.folders||!parsed.files) throw new Error();
+      if (!confirm('Загрузить резервную копию? Это заменит все текущие данные.')) return;
+      DATA=parsed; saveData();
+      document.getElementById('modal-settings').classList.remove('open');
+      renderLibrary(); toast('Данные восстановлены ✓');
+    } catch { toast('Ошибка: неверный файл'); }
+  };
+  reader.readAsText(file); this.value='';
+});
+
+document.getElementById('btn-clear-all').addEventListener('click', () => {
+  if (!confirm('Удалить ВСЕ данные? Это необратимо.')) return;
+  if (!confirm('Вы уверены?')) return;
+  DATA=defaultData(); saveData();
+  document.getElementById('modal-settings').classList.remove('open');
+  renderLibrary(); toast('Все данные удалены');
+});
+
+// ══════════════════════════════════════════════════
+// MOVE FILE TO FOLDER
+// ══════════════════════════════════════════════════
+function openMoveFileModal(fileId) {
+  const file = DATA.files.find(f => f.id === fileId);
+  if (!file) return;
+
+  // Build flat list of all folders with indentation
+  function collectFolders(parentId, depth) {
+    const result = [];
+    DATA.folders.filter(f => (f.parentId || null) === parentId).forEach(f => {
+      result.push({ id: f.id, name: f.name, icon: f.icon || '📁', depth });
+      result.push(...collectFolders(f.id, depth + 1));
+    });
+    return result;
+  }
+  const allFolders = collectFolders(null, 0);
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:700;display:flex;align-items:flex-end;';
+
+  const items = [
+    `<div class="ctx-item" data-folderid="" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;${!file.folderId ? 'border:1px solid var(--accent);' : ''}">
+      🏠 <span style="margin-left:4px;">Корневой список</span>
+      ${!file.folderId ? '<span style="margin-left:auto;color:var(--accent);font-size:12px;">сейчас здесь</span>' : ''}
+    </div>`
+  ];
+
+  allFolders.forEach(f => {
+    const isCurrent = file.folderId === f.id;
+    const indent = '　'.repeat(f.depth);
+    items.push(`<div class="ctx-item" data-folderid="${f.id}" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;${isCurrent ? 'border:1px solid var(--accent);' : ''}">
+      ${indent}${f.icon} <span style="margin-left:4px;">${esc(f.name)}</span>
+      ${isCurrent ? '<span style="margin-left:auto;color:var(--accent);font-size:12px;">сейчас здесь</span>' : ''}
+    </div>`);
+  });
+
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 36px;border-top:1px solid var(--border);max-height:80dvh;overflow-y:auto;">
+    <div style="font-size:16px;font-weight:600;margin-bottom:4px;">📂 Переместить текст</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">«${esc(file.name)}»</div>
+    ${items.join('')}
+    <div class="ctx-item" id="_move-cancel" style="border-radius:10px;background:var(--bg3);color:var(--text2);margin-top:4px;">Отмена</div>
+  </div>`;
+
+  document.body.appendChild(overlay);
+  const rm = () => document.body.removeChild(overlay);
+
+  overlay.querySelectorAll('[data-folderid]').forEach(el => {
+    el.addEventListener('click', () => {
+      const targetId = el.dataset.folderid || null;
+      file.folderId = targetId;
+      saveData();
+      rm();
+      renderLibrary();
+      const targetName = targetId
+        ? (DATA.folders.find(f => f.id === targetId)?.name || 'папку')
+        : 'корневой список';
+      toast(`Перемещено в: ${targetName}`);
+    });
+  });
+
+  overlay.querySelector('#_move-cancel').addEventListener('click', rm);
+  overlay.addEventListener('click', e => { if (e.target === overlay) rm(); });
+}
+
+// ══════════════════════════════════════════════════
+// EPUB IMPORT
+// ══════════════════════════════════════════════════
+document.getElementById('btn-epub-import').addEventListener('click', () => {
+  document.getElementById('inp-epub-file').click();
+});
+
+document.getElementById('inp-epub-file').addEventListener('change', async function() {
+  const file = this.files[0];
+  if (!file) return;
+  const status = document.getElementById('epub-status');
+  status.textContent = 'Загрузка библиотеки…';
+
+  try {
+    // Load JSZip if not already loaded
+    if (typeof JSZip === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Не удалось загрузить библиотеку. Проверьте интернет.'));
+        document.head.appendChild(s);
+      });
+    }
+
+    status.textContent = 'Читаю файл…';
+    const arrayBuffer = await file.arrayBuffer();
+    const zip = await JSZip.loadAsync(arrayBuffer);
+
+    // Parse container.xml to find OPF file
+    const containerXml = await zip.file('META-INF/container.xml').async('text');
+    const parser = new DOMParser();
+    const containerDoc = parser.parseFromString(containerXml, 'application/xml');
+    const opfPath = containerDoc.querySelector('rootfile').getAttribute('full-path');
+    const opfDir = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1) : '';
+
+    // Parse OPF
+    status.textContent = 'Читаю структуру…';
+    const opfText = await zip.file(opfPath).async('text');
+    const opfDoc = parser.parseFromString(opfText, 'application/xml');
+
+    // Build spine manifest
+    const manifest = {};
+    opfDoc.querySelectorAll('manifest item').forEach(item => {
+      manifest[item.getAttribute('id')] = {
+        href: item.getAttribute('href'),
+        type: item.getAttribute('media-type'),
+      };
+    });
+
+    // Get spine order
+    const spineItems = [];
+    opfDoc.querySelectorAll('spine itemref').forEach(ref => {
+      const id = ref.getAttribute('idref');
+      if (manifest[id] && manifest[id].type === 'application/xhtml+xml') {
+        spineItems.push({ id, href: manifest[id].href });
+      }
+    });
+
+    // Try to read NCX or NAV for chapter names
+    const chapterNames = {};
+    // Try NCX
+    const ncxItem = Object.values(manifest).find(m => m.type === 'application/x-dtbncx+xml');
+    if (ncxItem) {
+      try {
+        const ncxPath = opfDir + ncxItem.href;
+        const ncxText = await zip.file(ncxPath).async('text');
+        const ncxDoc = parser.parseFromString(ncxText, 'application/xml');
+        ncxDoc.querySelectorAll('navPoint').forEach(np => {
+          const label = np.querySelector('navLabel text')?.textContent?.trim();
+          const src = np.querySelector('content')?.getAttribute('src')?.split('#')[0];
+          if (label && src) chapterNames[src] = label;
+        });
+      } catch(e) {}
+    }
+    // Try NAV (epub3)
+    const navItem = Object.values(manifest).find(m => m.type === 'application/xhtml+xml' && m.href.includes('nav'));
+    if (navItem) {
+      try {
+        const navPath = opfDir + navItem.href;
+        const navText = await zip.file(navPath).async('text');
+        const navDoc = parser.parseFromString(navText, 'application/xhtml+xml');
+        navDoc.querySelectorAll('nav[epub\:type="toc"] a, nav a').forEach(a => {
+          const href = a.getAttribute('href')?.split('#')[0];
+          const label = a.textContent?.trim();
+          if (href && label) chapterNames[href] = label;
+        });
+      } catch(e) {}
+    }
+
+    // Extract chapters
+    status.textContent = `Извлекаю главы…`;
+    const chapters = [];
+    let chapterNum = 0;
+
+    for (const item of spineItems) {
+      const filePath = opfDir + item.href;
+      const hrefBase = item.href.split('/').pop();
+      let fileText = '';
+      try {
+        fileText = await zip.file(filePath).async('text');
+      } catch(e) {
+        try { fileText = await zip.file(item.href).async('text'); } catch(e2) { continue; }
+      }
+
+      // Parse HTML
+      const doc = parser.parseFromString(fileText, 'application/xhtml+xml');
+      // Remove script/style tags
+      doc.querySelectorAll('script,style').forEach(el => el.remove());
+
+      const bodyEl = doc.querySelector('body');
+      if (!bodyEl) continue;
+
+      // Extract text preserving paragraph structure
+      let chapterText = '';
+      function processNode(node) {
+        if (node.nodeType === 3) { // text node
+          const t = node.textContent.replace(/\s+/g, ' ');
+          if (t.trim()) chapterText += t;
+        } else if (node.nodeType === 1) {
+          const tag = node.tagName.toLowerCase();
+          if (['p','div','br','li'].includes(tag) && chapterText && !chapterText.endsWith('\n')) {
+            chapterText += '\n';
+          }
+          if (['h1','h2','h3','h4'].includes(tag)) {
+            chapterText += '\n# ';
+            node.childNodes.forEach(processNode);
+            chapterText += '\n';
+            return;
+          }
+          node.childNodes.forEach(processNode);
+          if (['p','div','li'].includes(tag)) chapterText += '\n';
+        }
+      }
+      processNode(bodyEl);
+
+      // Clean up text
+      chapterText = chapterText
+        .replace(/[ \t]+/g, ' ')
+        .replace(/\n[ \t]+/g, '\n')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      if (chapterText.length < 20) continue; // skip near-empty pages
+
+      chapterNum++;
+      // Find chapter name
+      const name = chapterNames[hrefBase]
+        || chapterNames[item.href]
+        || `Глава ${chapterNum}`;
+
+      chapters.push({ id: uid(), name, content: chapterText });
+    }
+
+    if (chapters.length === 0) {
+      status.textContent = 'Не удалось извлечь главы из файла.';
+      return;
+    }
+
+    // Create file entry (blank header — user fills manually)
+    const epubFileName = file.name.replace(/\.epub$/i, '');
+    const newFile = {
+      id: uid(),
+      name: epubFileName,
+      author: '',
+      desc: '',
+      tags: [],
+      simple: false,
+      chapters,
+      folderId: null,
+    };
+    DATA.files.push(newFile);
+    saveData();
+
+    status.textContent = '';
+    document.getElementById('modal-settings').classList.remove('open');
+    state.currentFileId = newFile.id;
+    renderLibrary();
+    // Open cover so user can fill in the header
+    setTimeout(() => {
+      state.currentFileId = newFile.id;
+      renderCover();
+      toast(`Импортировано ${chapters.length} глав ✓`);
+    }, 100);
+
+  } catch(err) {
+    console.error(err);
+    status.textContent = 'Ошибка: ' + err.message;
+  }
+  this.value = '';
+});
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+renderLibrary();
+</script>
+</body>
+</html>
