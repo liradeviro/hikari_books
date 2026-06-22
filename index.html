@@ -881,26 +881,19 @@ function openFolderModal(folderId=null) {
   const folder = folderId ? DATA.folders.find(f=>f.id===folderId) : null;
   document.getElementById('modal-folder-title').textContent = folder ? 'Редактировать папку' : 'Новая папка';
   document.getElementById('inp-folder-name').value = folder ? folder.name : '';
-  selectedFolderIcon = folder ? (folder.icon||'📁') : '📁';
-  document.getElementById('inp-folder-icon').value = folder ? (folder.icon||'') : '';
   document.getElementById('btn-folder-delete').style.display = folderId ? 'block' : 'none';
   document.getElementById('modal-folder').classList.add('open');
 }
 
-document.getElementById('folder-emoji-picker').querySelectorAll('span').forEach(s => {
-  s.addEventListener('click', () => { selectedFolderIcon = s.dataset.em; document.getElementById('inp-folder-icon').value = s.dataset.em; });
-});
-
 document.getElementById('btn-folder-save').addEventListener('click', () => {
   const name = document.getElementById('inp-folder-name').value.trim();
   if (!name) { toast('Введите название'); return; }
-  const icon = document.getElementById('inp-folder-icon').value.trim() || selectedFolderIcon;
   if (state.editingFolderId) {
     const f = DATA.folders.find(x=>x.id===state.editingFolderId);
-    f.name = name; f.icon = icon;
+    f.name = name;
     toast('Папка обновлена');
   } else {
-    DATA.folders.push({ id: uid(), name, icon, parentId: currentFolderId(), createdAt: Date.now() });
+    DATA.folders.push({ id: uid(), name, parentId: currentFolderId(), createdAt: Date.now() });
     toast('Папка создана');
   }
   saveData();
