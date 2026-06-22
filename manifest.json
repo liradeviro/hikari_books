@@ -1,6 +1,6 @@
 {
   "name": "Hikari Books",
-  "short_name": "Hikari",
+  "short_name": "HiBooks",
   "start_url": "/hikari_books/",
   "display": "standalone",
   "background_color": "#ffffff",
