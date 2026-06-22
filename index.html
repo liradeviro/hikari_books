@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#f5eddb">
-<title>Читалочка</title>
+<title>Hikari Books</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
@@ -41,6 +41,7 @@
 
   .content { flex: 1; padding: 16px; overflow-y: auto; }
 
+  /* breadcrumb */
   .breadcrumb {
     display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
     padding: 10px 16px 0; font-size: 13px; color: var(--text2);
@@ -117,12 +118,12 @@
 
   label { font-size: 13px; color: var(--text2); display: block; margin-bottom: 4px; }
   .field { margin-bottom: 16px; }
-  input[type=text], input[type=password], textarea, select {
+  input[type=text], textarea, select {
     width: 100%; background: var(--bg3); border: 1px solid var(--border);
     color: var(--text); font-size: 15px; padding: 11px 13px;
     border-radius: 9px; outline: none; font-family: var(--font-ui); transition: border-color .15s;
   }
-  input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus { border-color: var(--accent2); }
+  input[type=text]:focus, textarea:focus, select:focus { border-color: var(--accent2); }
   textarea { resize: vertical; min-height: 80px; }
   select option { background: var(--bg3); }
 
@@ -159,6 +160,7 @@
   }
   .toc-item-title { flex: 1; font-size: 15px; }
 
+  /* simple-text edit button on cover */
   .cover-edit-btn {
     display: block; margin: 20px 16px 0;
     padding: 14px; background: var(--accent); color: #fff;
@@ -242,15 +244,21 @@
 <!-- LIBRARY -->
 <div class="screen active" id="screen-library">
   <div class="topbar">
-    <span class="topbar-title">📚 МоиТексты</span>
-    <button class="btn-icon" id="btn-search">🔍</button>
-    <button class="btn-icon" id="btn-settings">⚙️</button>
+    <span class="topbar-title" style="display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.94513 1.25H14.0549C15.4225 1.24998 16.5248 1.24996 17.3918 1.36652C18.2919 1.48754 19.0497 1.74643 19.6517 2.34835C20.2536 2.95027 20.5125 3.70814 20.6335 4.60825C20.75 5.47522 20.75 6.57754 20.75 7.94513V16.0549C20.75 17.4225 20.75 18.5248 20.6335 19.3918C20.5125 20.2919 20.2536 21.0497 19.6517 21.6517C19.0497 22.2536 18.2919 22.5125 17.3918 22.6335C16.5248 22.75 15.4225 22.75 14.0549 22.75H9.94513C8.57754 22.75 7.47522 22.75 6.60825 22.6335C5.70814 22.5125 4.95027 22.2536 4.34835 21.6517C3.74643 21.0497 3.48754 20.2919 3.36652 19.3918C3.24996 18.5248 3.24998 17.4225 3.25 16.0549V7.94513C3.24998 6.57754 3.24996 5.47522 3.36652 4.60825C3.48754 3.70814 3.74643 2.95027 4.34835 2.34835C4.95027 1.74643 5.70814 1.48754 6.60825 1.36652C7.47522 1.24996 8.57754 1.24998 9.94513 1.25ZM6.25 2.96027C5.85789 3.06485 5.60532 3.2127 5.40901 3.40901C5.13225 3.68577 4.9518 4.07435 4.85315 4.80812C4.75159 5.56347 4.75 6.56458 4.75 8V15.9259C5.10224 15.6798 5.49923 15.4925 5.92721 15.3778C6.0305 15.3501 6.13749 15.3284 6.25 15.3114V2.96027ZM7.75 2.7768V15.25H19.25V8C19.25 6.56458 19.2484 5.56347 19.1469 4.80812C19.0482 4.07435 18.8678 3.68577 18.591 3.40901C18.3142 3.13225 17.9257 2.9518 17.1919 2.85315C16.4365 2.75159 15.4354 2.75 14 2.75H10C9.09219 2.75 8.35808 2.75064 7.75 2.7768ZM19.2492 16.75H8.25V19.5309C8.25 19.6691 8.24958 19.8276 8.27085 19.9638C8.29687 20.1302 8.38245 20.4514 8.71511 20.6468C9.03549 20.8349 9.34884 20.765 9.49778 20.7187C9.62763 20.6783 9.77001 20.6105 9.87618 20.56L11 20.0261L12.0993 20.5483C12.23 20.6105 12.3724 20.6783 12.5022 20.7187C12.6512 20.765 12.9645 20.8349 13.2849 20.6468C13.6176 20.4514 13.7031 20.1302 13.7291 19.9638C13.7504 19.8276 13.75 19.6691 13.75 19.5578V16.75H19.2492Z" fill="currentColor"/></svg> Hikari Books</span>
+    <button class="btn-icon" id="btn-search"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.5 2.75C6.66751 2.75 2.75 6.66751 2.75 11.5C2.75 16.3325 6.66751 20.25 11.5 20.25C16.3325 20.25 20.25 16.3325 20.25 11.5C20.25 6.66751 16.3325 2.75 11.5 2.75ZM1.25 11.5C1.25 5.83908 5.83908 1.25 11.5 1.25C17.1609 1.25 21.75 5.83908 21.75 11.5C21.75 17.1609 17.1609 21.75 11.5 21.75C5.83908 21.75 1.25 17.1609 1.25 11.5ZM19.4697 19.4697C19.7626 19.1768 20.2374 19.1768 20.5303 19.4697L22.5303 21.4697C22.8232 21.7626 22.8232 22.2374 22.5303 22.5303C22.2374 22.8232 21.7626 22.8232 21.4697 22.5303L19.4697 20.5303C19.1768 20.2374 19.1768 19.7626 19.4697 19.4697Z" fill="currentColor"/></svg></button>
+    <button class="btn-icon" id="btn-settings"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 8.25C9.92894 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92894 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M11.9747 1.25C11.5303 1.24999 11.1592 1.24999 10.8546 1.27077C10.5375 1.29241 10.238 1.33905 9.94761 1.45933C9.27379 1.73844 8.73843 2.27379 8.45932 2.94762C8.31402 3.29842 8.27467 3.66812 8.25964 4.06996C8.24756 4.39299 8.08454 4.66251 7.84395 4.80141C7.60337 4.94031 7.28845 4.94673 7.00266 4.79568C6.64714 4.60777 6.30729 4.45699 5.93083 4.40743C5.20773 4.31223 4.47642 4.50819 3.89779 4.95219C3.64843 5.14353 3.45827 5.3796 3.28099 5.6434C3.11068 5.89681 2.92517 6.21815 2.70294 6.60307L2.67769 6.64681C2.45545 7.03172 2.26993 7.35304 2.13562 7.62723C1.99581 7.91267 1.88644 8.19539 1.84541 8.50701C1.75021 9.23012 1.94617 9.96142 2.39016 10.5401C2.62128 10.8412 2.92173 11.0602 3.26217 11.2741C3.53595 11.4461 3.68788 11.7221 3.68786 12C3.68785 12.2778 3.53592 12.5538 3.26217 12.7258C2.92169 12.9397 2.62121 13.1587 2.39007 13.4599C1.94607 14.0385 1.75012 14.7698 1.84531 15.4929C1.88634 15.8045 1.99571 16.0873 2.13552 16.3727C2.26983 16.6469 2.45535 16.9682 2.67758 17.3531L2.70284 17.3969C2.92507 17.7818 3.11058 18.1031 3.28089 18.3565C3.45817 18.6203 3.64833 18.8564 3.89769 19.0477C4.47632 19.4917 5.20763 19.6877 5.93073 19.5925C6.30717 19.5429 6.647 19.3922 7.0025 19.2043C7.28833 19.0532 7.60329 19.0596 7.8439 19.1986C8.08452 19.3375 8.24756 19.607 8.25964 19.9301C8.27467 20.3319 8.31403 20.7016 8.45932 21.0524C8.73843 21.7262 9.27379 22.2616 9.94761 22.5407C10.238 22.661 10.5375 22.7076 10.8546 22.7292C11.1592 22.75 11.5303 22.75 11.9747 22.75H12.0252C12.4697 22.75 12.8407 22.75 13.1454 22.7292C13.4625 22.7076 13.762 22.661 14.0524 22.5407C14.7262 22.2616 15.2616 21.7262 15.5407 21.0524C15.686 20.7016 15.7253 20.3319 15.7403 19.93C15.7524 19.607 15.9154 19.3375 16.156 19.1985C16.3966 19.0596 16.7116 19.0532 16.9974 19.2042C17.3529 19.3921 17.6927 19.5429 18.0692 19.5924C18.7923 19.6876 19.5236 19.4917 20.1022 19.0477C20.3516 18.8563 20.5417 18.6203 20.719 18.3565C20.8893 18.1031 21.0748 17.7818 21.297 17.3969L21.3223 17.3531C21.5445 16.9682 21.7301 16.6468 21.8644 16.3726C22.0042 16.0872 22.1135 15.8045 22.1546 15.4929C22.2498 14.7697 22.0538 14.0384 21.6098 13.4598C21.3787 13.1586 21.0782 12.9397 20.7378 12.7258C20.464 12.5538 20.3121 12.2778 20.3121 11.9999C20.3121 11.7221 20.464 11.4462 20.7377 11.2742C21.0783 11.0603 21.3788 10.8414 21.6099 10.5401C22.0539 9.96149 22.2499 9.23019 22.1547 8.50708C22.1136 8.19546 22.0043 7.91274 21.8645 7.6273C21.7302 7.35313 21.5447 7.03183 21.3224 6.64695L21.2972 6.60318C21.0749 6.21825 20.8894 5.89688 20.7191 5.64347C20.5418 5.37967 20.3517 5.1436 20.1023 4.95225C19.5237 4.50826 18.7924 4.3123 18.0692 4.4075C17.6928 4.45706 17.353 4.60782 16.9975 4.79572C16.7117 4.94679 16.3967 4.94036 16.1561 4.80144C15.9155 4.66253 15.7524 4.39297 15.7403 4.06991C15.7253 3.66808 15.686 3.2984 15.5407 2.94762C15.2616 2.27379 14.7262 1.73844 14.0524 1.45933C13.762 1.33905 13.4625 1.29241 13.1454 1.27077C12.8407 1.24999 12.4697 1.24999 12.0252 1.25H11.9747ZM10.5216 2.84515C10.5988 2.81319 10.716 2.78372 10.9567 2.76729C11.2042 2.75041 11.5238 2.75 12 2.75C12.4762 2.75 12.7958 2.75041 13.0432 2.76729C13.284 2.78372 13.4012 2.81319 13.4783 2.84515C13.7846 2.97202 14.028 3.21536 14.1548 3.52165C14.1949 3.61826 14.228 3.76887 14.2414 4.12597C14.271 4.91835 14.68 5.68129 15.4061 6.10048C16.1321 6.51968 16.9974 6.4924 17.6984 6.12188C18.0143 5.9549 18.1614 5.90832 18.265 5.89467C18.5937 5.8514 18.9261 5.94047 19.1891 6.14228C19.2554 6.19312 19.3395 6.27989 19.4741 6.48016C19.6125 6.68603 19.7726 6.9626 20.0107 7.375C20.2488 7.78741 20.4083 8.06438 20.5174 8.28713C20.6235 8.50382 20.6566 8.62007 20.6675 8.70287C20.7108 9.03155 20.6217 9.36397 20.4199 9.62698C20.3562 9.70995 20.2424 9.81399 19.9397 10.0041C19.2684 10.426 18.8122 11.1616 18.8121 11.9999C18.8121 12.8383 19.2683 13.574 19.9397 13.9959C20.2423 14.186 20.3561 14.29 20.4198 14.373C20.6216 14.636 20.7107 14.9684 20.6674 15.2971C20.6565 15.3799 20.6234 15.4961 20.5173 15.7128C20.4082 15.9355 20.2487 16.2125 20.0106 16.6249C19.7725 17.0373 19.6124 17.3139 19.474 17.5198C19.3394 17.72 19.2553 17.8068 19.189 17.8576C18.926 18.0595 18.5936 18.1485 18.2649 18.1053C18.1613 18.0916 18.0142 18.045 17.6983 17.8781C16.9973 17.5075 16.132 17.4803 15.4059 17.8995C14.68 18.3187 14.271 19.0816 14.2414 19.874C14.228 20.2311 14.1949 20.3817 14.1548 20.4784C14.028 20.7846 13.7846 21.028 13.4783 21.1549C13.4012 21.1868 13.284 21.2163 13.0432 21.2327C12.7958 21.2496 12.4762 21.25 12 21.25C11.5238 21.25 11.2042 21.2496 10.9567 21.2327C10.716 21.2163 10.5988 21.1868 10.5216 21.1549C10.2154 21.028 9.97201 20.7846 9.84514 20.4784C9.80512 20.3817 9.77195 20.2311 9.75859 19.874C9.72896 19.0817 9.31997 18.3187 8.5939 17.8995C7.86784 17.4803 7.00262 17.5076 6.30158 17.8781C5.98565 18.0451 5.83863 18.0917 5.73495 18.1053C5.40626 18.1486 5.07385 18.0595 4.81084 17.8577C4.74458 17.8069 4.66045 17.7201 4.52586 17.5198C4.38751 17.314 4.22736 17.0374 3.98926 16.625C3.75115 16.2126 3.59171 15.9356 3.4826 15.7129C3.37646 15.4962 3.34338 15.3799 3.33248 15.2971C3.28921 14.9684 3.37828 14.636 3.5801 14.373C3.64376 14.2901 3.75761 14.186 4.0602 13.9959C4.73158 13.5741 5.18782 12.8384 5.18786 12.0001C5.18791 11.1616 4.73165 10.4259 4.06021 10.004C3.75769 9.81389 3.64385 9.70987 3.58019 9.62691C3.37838 9.3639 3.28931 9.03149 3.33258 8.7028C3.34348 8.62001 3.37656 8.50375 3.4827 8.28707C3.59181 8.06431 3.75125 7.78734 3.98935 7.37493C4.22746 6.96253 4.3876 6.68596 4.52596 6.48009C4.66055 6.27983 4.74468 6.19305 4.81093 6.14222C5.07395 5.9404 5.40636 5.85133 5.73504 5.8946C5.83873 5.90825 5.98576 5.95483 6.30173 6.12184C7.00273 6.49235 7.86791 6.51962 8.59394 6.10045C9.31998 5.68128 9.72896 4.91837 9.75859 4.12602C9.77195 3.76889 9.80512 3.61827 9.84514 3.52165C9.97201 3.21536 10.2154 2.97202 10.5216 2.84515Z" fill="currentColor"/></svg></button>
   </div>
   <div id="breadcrumb-bar" class="breadcrumb"></div>
+  <div id="sort-bar" style="display:flex;align-items:center;gap:8px;padding:8px 16px 0;font-size:13px;color:var(--text2);">
+    <span>Сортировка:</span>
+    <button class="sort-btn active" data-sort="name" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:16px;font-size:13px;cursor:pointer;">По имени</button>
+    <button class="sort-btn" data-sort="date" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:16px;font-size:13px;cursor:pointer;">По дате</button>
+    <button id="sort-dir-btn" style="background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:0 4px;" title="Направление">↑</button>
+  </div>
   <div class="content" id="library-content"></div>
   <div class="fab-group" id="fab-library">
-    <button class="fab-mini" id="fab-new-subfolder">📁 Подпапка</button>
-    <button class="fab-mini" id="fab-new-folder">📁 Папка</button>
+    <button class="fab-mini" id="fab-new-subfolder">Подпапка</button>
+    <button class="fab-mini" id="fab-new-folder">Папка</button>
     <button class="fab-mini" id="fab-new-file">📄 Текст</button>
     <button class="fab" id="fab-toggle">＋</button>
   </div>
@@ -261,7 +269,7 @@
   <div class="topbar">
     <button class="btn-icon" id="btn-cover-back">←</button>
     <span class="topbar-title" id="cover-topbar-title"></span>
-    <button class="btn-icon" id="btn-cover-edit">✏️</button>
+    <button class="btn-icon" id="btn-cover-edit"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.7566 2.62145C16.5852 0.792851 19.55 0.792851 21.3786 2.62145C23.2072 4.45005 23.2072 7.41479 21.3786 9.24339L11.8933 18.7287C11.3514 19.2706 11.0323 19.5897 10.6774 19.8665C10.2592 20.1927 9.80655 20.4725 9.32766 20.7007C8.92136 20.8943 8.49334 21.037 7.76623 21.2793L4.43511 22.3897L3.63303 22.6571C2.98247 22.8739 2.26522 22.7046 1.78032 22.2197C1.29542 21.7348 1.1261 21.0175 1.34296 20.367L2.72068 16.2338C2.96303 15.5067 3.10568 15.0787 3.29932 14.6724C3.52755 14.1935 3.80727 13.7409 4.13354 13.3226C4.41035 12.9677 4.72939 12.6487 5.27137 12.1067L14.7566 2.62145ZM4.40051 20.8201L7.24203 19.8729C8.03314 19.6092 8.36927 19.4958 8.68233 19.3466C9.06287 19.1653 9.42252 18.943 9.75492 18.6837C10.0284 18.4704 10.2801 18.2205 10.8698 17.6308L18.4393 10.0614C17.6506 9.78321 16.6346 9.26763 15.6835 8.31651C14.7324 7.36538 14.2168 6.34939 13.9387 5.56075L6.36917 13.1302C5.77951 13.7199 5.52959 13.9716 5.3163 14.2451C5.05704 14.5775 4.83476 14.9371 4.65341 15.3177C4.50421 15.6307 4.3908 15.9669 4.12709 16.758L3.17992 19.5995L4.40051 20.8201ZM15.1554 4.34404C15.1896 4.519 15.2474 4.75684 15.3438 5.03487C15.561 5.66083 15.9712 6.48288 16.7442 7.25585C17.5171 8.02881 18.3392 8.43903 18.9651 8.6562C19.2432 8.75266 19.481 8.81046 19.656 8.84466L20.3179 8.18272C21.5607 6.93991 21.5607 4.92492 20.3179 3.68211C19.0751 2.4393 17.0601 2.4393 15.8173 3.68211L15.1554 4.34404Z" fill="currentColor"/></svg></button>
   </div>
   <div id="cover-body" style="flex:1;overflow-y:auto;"></div>
 </div>
@@ -271,7 +279,7 @@
   <div class="topbar">
     <button class="btn-icon" id="btn-chapter-back">←</button>
     <span class="topbar-title" id="chapter-topbar-title"></span>
-    <button class="btn-icon" id="btn-chapter-edit">✏️</button>
+    <button class="btn-icon" id="btn-chapter-edit"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.7566 2.62145C16.5852 0.792851 19.55 0.792851 21.3786 2.62145C23.2072 4.45005 23.2072 7.41479 21.3786 9.24339L11.8933 18.7287C11.3514 19.2706 11.0323 19.5897 10.6774 19.8665C10.2592 20.1927 9.80655 20.4725 9.32766 20.7007C8.92136 20.8943 8.49334 21.037 7.76623 21.2793L4.43511 22.3897L3.63303 22.6571C2.98247 22.8739 2.26522 22.7046 1.78032 22.2197C1.29542 21.7348 1.1261 21.0175 1.34296 20.367L2.72068 16.2338C2.96303 15.5067 3.10568 15.0787 3.29932 14.6724C3.52755 14.1935 3.80727 13.7409 4.13354 13.3226C4.41035 12.9677 4.72939 12.6487 5.27137 12.1067L14.7566 2.62145ZM4.40051 20.8201L7.24203 19.8729C8.03314 19.6092 8.36927 19.4958 8.68233 19.3466C9.06287 19.1653 9.42252 18.943 9.75492 18.6837C10.0284 18.4704 10.2801 18.2205 10.8698 17.6308L18.4393 10.0614C17.6506 9.78321 16.6346 9.26763 15.6835 8.31651C14.7324 7.36538 14.2168 6.34939 13.9387 5.56075L6.36917 13.1302C5.77951 13.7199 5.52959 13.9716 5.3163 14.2451C5.05704 14.5775 4.83476 14.9371 4.65341 15.3177C4.50421 15.6307 4.3908 15.9669 4.12709 16.758L3.17992 19.5995L4.40051 20.8201ZM15.1554 4.34404C15.1896 4.519 15.2474 4.75684 15.3438 5.03487C15.561 5.66083 15.9712 6.48288 16.7442 7.25585C17.5171 8.02881 18.3392 8.43903 18.9651 8.6562C19.2432 8.75266 19.481 8.81046 19.656 8.84466L20.3179 8.18272C21.5607 6.93991 21.5607 4.92492 20.3179 3.68211C19.0751 2.4393 17.0601 2.4393 15.8173 3.68211L15.1554 4.34404Z" fill="currentColor"/></svg></button>
   </div>
   <div class="chapter-body" id="chapter-body"></div>
   <div class="chapter-nav">
@@ -312,6 +320,9 @@
     <button class="tb-btn" id="tb-div-stars">✦✦✦</button>
     <button class="tb-btn" id="tb-h1">H1</button>
     <button class="tb-btn" id="tb-h2">H2</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" id="tb-justify" title="Выравнивание по ширине">⬌</button>
+    <button class="tb-btn" id="tb-indent" title="Абзацный отступ">⇥</button>
   </div>
   <textarea id="editor-area" placeholder="Начните писать..."></textarea>
 </div>
@@ -371,11 +382,26 @@
       <input type="text" id="inp-file-tags" placeholder="романтика, драма, AU…">
     </div>
     <div class="field">
+      <label>Направленность</label>
+      <select id="inp-file-pairing">
+        <option value="">— не указана —</option>
+        <option value="Слеш">Слеш</option>
+        <option value="Гет">Гет</option>
+        <option value="Джен">Джен</option>
+      </select>
+    </div>
+    <div class="field">
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
         <input type="checkbox" id="inp-file-simple" style="width:18px;height:18px;accent-color:var(--accent);">
         <span style="font-size:15px;color:var(--text);">Простой текст (без глав)</span>
       </label>
       <div style="font-size:12px;color:var(--text2);margin-top:4px;padding-left:28px;">На странице обложки будет кнопка «Редактировать текст»</div>
+    </div>
+    <div class="field">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="inp-file-fav" style="width:18px;height:18px;accent-color:#3A52EE;">
+        <span style="display:flex;align-items:center;gap:6px;font-size:15px;color:var(--text);"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path d="M3.41982 10.5H7.74973L11.2714 18.952C11.1342 18.8758 11.0064 18.7763 10.894 18.6537L3.41982 10.5Z" fill="#3A52EE"/><path d="M3.39844 9.00001L6.69868 5.03972C6.98367 4.69773 7.40584 4.5 7.85101 4.5H9.20917L7.70916 9.00001H3.39844Z" fill="#3A52EE"/><path d="M10.7903 4.5L9.2903 9.00001H14.7092L13.2092 4.5H10.7903Z" fill="#3A52EE"/><path d="M14.7903 4.5L16.2903 9.00001H20.601L17.3008 5.03972C17.0158 4.69773 16.5936 4.5 16.1485 4.5H14.7903Z" fill="#3A52EE"/><path d="M20.5796 10.5H16.2497L12.7281 18.952C12.8653 18.8758 12.993 18.7763 13.1055 18.6537L20.5796 10.5Z" fill="#3A52EE"/><path d="M11.9997 16.8L9.37473 10.5H14.6247L11.9997 16.8Z" fill="#3A52EE"/></svg> Добавить в избранное</span>
+      </label>
     </div>
     <button class="btn btn-primary" id="btn-file-save">Сохранить</button>
     <button class="btn btn-secondary" id="btn-file-cancel">Отмена</button>
@@ -403,7 +429,6 @@
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">⚙️ Настройки</div>
-
     <div style="font-size:13px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Резервная копия</div>
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.6;color:var(--text2);">
       Экспорт сохраняет <b style="color:var(--text)">все папки, тексты и главы</b> в файл <code style="background:var(--bg2);padding:1px 5px;border-radius:4px;">.json</code>.
@@ -413,7 +438,6 @@
     <button class="btn btn-secondary" id="btn-import">⬆️ Восстановить из файла</button>
     <input type="file" id="inp-import-file" accept=".json" style="display:none;">
     <div style="font-size:12px;color:var(--text2);margin:6px 0 0;text-align:center;">Внимание: заменит все текущие данные</div>
-
     <div style="border-top:1px solid var(--border);margin:20px 0 16px;"></div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Импорт EPUB</div>
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.6;color:var(--text2);">
@@ -422,19 +446,30 @@
     <button class="btn btn-secondary" id="btn-epub-import">📖 Импортировать EPUB</button>
     <input type="file" id="inp-epub-file" accept=".epub" style="display:none;">
     <div id="epub-status" style="font-size:13px;color:var(--text2);margin-top:8px;text-align:center;min-height:18px;"></div>
-
     <div style="border-top:1px solid var(--border);margin:20px 0 16px;"></div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">GitHub Sync</div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.6;color:var(--text2);">
-      Синхронизация данных через приватный GitHub репозиторий. Работает на всех устройствах.
+<div style="font-size:13px;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">GitHub Sync</div>
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.6;color:var(--text2);">
+  Синхронизация данных через приватный GitHub репозиторий. Работает на всех устройствах.
+</div>
+<button class="btn btn-secondary" id="btn-github-settings">🔗 Настроить GitHub</button>
+<button class="btn btn-secondary" id="btn-github-save" style="margin-top:10px;">☁️ Сохранить в GitHub</button>
+<button class="btn btn-secondary" id="btn-github-load" style="margin-top:10px;">⬇️ Загрузить из GitHub</button>
     </div>
-    <button class="btn btn-secondary" id="btn-github-settings">🔗 Настроить GitHub</button>
-    <button class="btn btn-secondary" id="btn-github-save" style="margin-top:10px;">☁️ Сохранить в GitHub</button>
-    <button class="btn btn-secondary" id="btn-github-load" style="margin-top:10px;">⬇️ Загрузить из GitHub</button>
-
     <div style="border-top:1px solid var(--border);margin:20px 0 16px;"></div>
     <button class="btn btn-danger" id="btn-clear-all">🗑 Удалить все данные</button>
-    <button class="btn btn-secondary" id="btn-settings-close" style="margin-top:10px;">Закрыть</button>
+  document.getElementById('btn-github-settings').addEventListener('click', () => {
+  document.getElementById('modal-settings').classList.remove('open');
+  openGithubSettings();
+});
+document.getElementById('btn-github-save').addEventListener('click', () => {
+  document.getElementById('modal-settings').classList.remove('open');
+  githubSyncSave();
+});
+document.getElementById('btn-github-load').addEventListener('click', () => {
+  document.getElementById('modal-settings').classList.remove('open');
+  githubSyncLoad();
+});
+     <button class="btn btn-secondary" id="btn-settings-close" style="margin-top:10px;">Закрыть</button>
   </div>
 </div>
 
@@ -442,4 +477,1140 @@
 <div class="ctx-menu" id="ctx-toc">
   <div class="ctx-item" id="ctx-toc-edit">✏️ Переименовать</div>
   <div class="ctx-sep"></div>
-  <div class="ctx-item
+  <div class="ctx-item danger" id="ctx-toc-delete">🗑 Удалить главу</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+const STORE_KEY = 'mytexts_v1';
+function defaultData() { return { folders: [], files: [] }; }
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || defaultData(); }
+  catch { return defaultData(); }
+}
+function saveData() { localStorage.setItem(STORE_KEY, JSON.stringify(DATA)); }
+let DATA = loadData();
+
+// ── STATE ──
+// folderStack: array of folderIds, empty = root
+let state = {
+  folderStack: [],       // navigation breadcrumb stack
+  currentFileId: null,
+  currentChapterIdx: null,
+  editingFolderId: null,
+  editingFileId: null,
+  editingChapterId: null,
+  fabOpen: false,
+  ctxTarget: null,
+};
+
+// current folder id (top of stack, or null = root)
+function currentFolderId() { return state.folderStack.length ? state.folderStack[state.folderStack.length-1] : null; }
+
+// ── SORT STATE ──
+let sortBy = 'name'; // 'name' | 'date'
+let sortAsc = true;
+
+function sortedItems(arr, type) {
+  return [...arr].sort((a, b) => {
+    let va, vb;
+    if (sortBy === 'name') {
+      va = (type === 'folder' ? a.name : a.name).toLowerCase();
+      vb = (type === 'folder' ? b.name : b.name).toLowerCase();
+      return sortAsc ? va.localeCompare(vb, 'ru') : vb.localeCompare(va, 'ru');
+    } else {
+      va = a.createdAt || 0;
+      vb = b.createdAt || 0;
+      return sortAsc ? va - vb : vb - va;
+    }
+  });
+}
+
+function initSortBar() {
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sortBy = btn.dataset.sort;
+      document.querySelectorAll('.sort-btn').forEach(b => {
+        b.style.color = b === btn ? 'var(--text)' : 'var(--text2)';
+        b.style.borderColor = b === btn ? 'var(--accent)' : 'var(--border)';
+      });
+      renderLibrary();
+    });
+  });
+  document.getElementById('sort-dir-btn').addEventListener('click', () => {
+    sortAsc = !sortAsc;
+    document.getElementById('sort-dir-btn').textContent = sortAsc ? '↑' : '↓';
+    renderLibrary();
+  });
+}
+
+// ── UTILS ──
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function plural(n,a,b,c) {
+  const m=n%100; if(m>=11&&m<=19) return c;
+  const r=n%10; if(r===1) return a; if(r>=2&&r<=4) return b; return c;
+}
+function closeFab() {
+  state.fabOpen = false;
+  document.getElementById('fab-toggle').textContent = '＋';
+  ['fab-new-folder','fab-new-file','fab-new-subfolder'].forEach(id => {
+    document.getElementById(id).classList.remove('visible');
+  });
+}
+
+// ── FOLDER HELPERS ──
+function getFolderPath(folderId) {
+  // returns array of folder objects from root to folderId
+  const path = [];
+  let id = folderId;
+  while (id) {
+    const f = DATA.folders.find(x => x.id === id);
+    if (!f) break;
+    path.unshift(f);
+    id = f.parentId || null;
+  }
+  return path;
+}
+
+// ══════════════════════════════════════════════════
+// RENDER LIBRARY
+// ══════════════════════════════════════════════════
+function renderLibrary() {
+  showScreen('library');
+  closeFab();
+  const fid = currentFolderId();
+
+  // breadcrumb
+  const bc = document.getElementById('breadcrumb-bar');
+  const path = fid ? getFolderPath(fid) : [];
+  if (path.length === 0) {
+    bc.innerHTML = '';
+  } else {
+    let html = `<span data-gotoroot="1">🏠 Hikari Books</span>`;
+    path.forEach((f, i) => {
+      html += `<span class="sep"> › </span>`;
+      if (i < path.length - 1) {
+        html += `<span data-gotofolder="${f.id}">${esc(f.name)}</span>`;
+      } else {
+        html += `<span style="color:var(--text);font-weight:600;">${esc(f.name)}</span>`;
+      }
+    });
+    bc.innerHTML = html;
+    bc.querySelectorAll('[data-gotoroot]').forEach(el => el.addEventListener('click', () => { state.folderStack = []; renderLibrary(); }));
+    bc.querySelectorAll('[data-gotofolder]').forEach(el => el.addEventListener('click', () => {
+      const idx = state.folderStack.indexOf(el.dataset.gotofolder);
+      if (idx !== -1) state.folderStack = state.folderStack.slice(0, idx+1);
+      renderLibrary();
+    }));
+  }
+
+  // update topbar
+  const currentFolder = fid ? DATA.folders.find(f => f.id === fid) : null;
+  document.querySelector('#screen-library .topbar-title').textContent =
+    currentFolder ? (currentFolder.icon||'📁') + ' ' + currentFolder.name : '📚 Hikari Books';
+
+  // subfolder fab: show only when inside a folder
+  const subfab = document.getElementById('fab-new-subfolder');
+  subfab.style.display = fid ? 'flex' : 'none';
+
+  // back button in topbar (show when inside folder)
+  let backBtn = document.getElementById('btn-lib-back');
+  if (!backBtn) {
+    backBtn = document.createElement('button');
+    backBtn.className = 'btn-icon';
+    backBtn.id = 'btn-lib-back';
+    backBtn.textContent = '←';
+    backBtn.addEventListener('click', () => { state.folderStack.pop(); renderLibrary(); });
+    document.querySelector('#screen-library .topbar').prepend(backBtn);
+  }
+  backBtn.style.display = fid ? 'flex' : 'none';
+
+  const cont = document.getElementById('library-content');
+  const childFolders = sortedItems(DATA.folders.filter(f => (f.parentId || null) === fid), 'folder');
+  const childFiles   = sortedItems(DATA.files.filter(f   => (f.folderId || null) === fid), 'file');
+  const html = [];
+
+  if (childFolders.length === 0 && childFiles.length === 0) {
+    html.push(`<div class="empty">
+      <div class="empty-icon">${fid ? '📂' : '📖'}</div>
+      <div class="empty-title">${fid ? 'Папка пуста' : 'Библиотека пуста'}</div>
+      <div class="empty-sub">Нажмите + чтобы добавить</div>
+    </div>`);
+  } else {
+    if (childFolders.length > 0) {
+      html.push('<div class="section-label">Папки</div>');
+      childFolders.forEach(f => {
+        const subFolderCount = DATA.folders.filter(x => x.parentId === f.id).length;
+        const fileCount = DATA.files.filter(x => x.folderId === f.id).length;
+        const total = subFolderCount + fileCount;
+        html.push(`<div class="folder-card" data-id="${f.id}">
+          <span class="folder-icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.85929 1.25001C6.88904 1.25001 6.91919 1.25002 6.94976 1.25002L6.98675 1.25001C7.33818 1.24999 7.56433 1.24998 7.78542 1.27065C8.7367 1.35961 9.63905 1.73337 10.3746 2.34313C10.5456 2.48485 10.7055 2.64477 10.954 2.89329L11.5303 3.46969C12.3761 4.3154 12.7012 4.6311 13.0768 4.84005C13.2948 4.96134 13.526 5.05713 13.766 5.12552C14.1793 5.24333 14.6324 5.25002 15.8284 5.25002L16.253 5.25002C17.526 5.25 18.5521 5.24998 19.364 5.35206C20.2054 5.45784 20.9204 5.68358 21.5077 6.21185C21.6061 6.30032 21.6997 6.39394 21.7882 6.49231C22.3165 7.07965 22.5422 7.79459 22.648 8.63601C22.75 9.4479 22.75 10.4741 22.75 11.747V14.0564C22.75 15.8942 22.75 17.3498 22.5969 18.489C22.4393 19.6615 22.1071 20.6104 21.3588 21.3588C20.6104 22.1071 19.6615 22.4393 18.489 22.5969C17.3498 22.75 15.8942 22.75 14.0564 22.75H9.94361C8.10584 22.75 6.65021 22.75 5.51099 22.5969C4.33857 22.4393 3.38962 22.1071 2.64126 21.3588C1.8929 20.6104 1.56078 19.6615 1.40315 18.489C1.24999 17.3498 1.25 15.8942 1.25002 14.0564L1.25002 6.94976C1.25002 6.91919 1.25001 6.88904 1.25001 6.85929C1.2499 6.06338 1.24982 5.55685 1.33237 5.11935C1.6949 3.19788 3.19788 1.6949 5.11935 1.33237C5.55685 1.24982 6.06338 1.2499 6.85929 1.25001ZM6.94976 2.75002C6.03312 2.75002 5.67873 2.75329 5.39746 2.80636C4.08277 3.05441 3.05441 4.08277 2.80636 5.39746C2.75329 5.67873 2.75002 6.03312 2.75002 6.94976V14C2.75002 15.9068 2.75161 17.2615 2.88978 18.2892C3.02504 19.2953 3.27871 19.8749 3.70192 20.2981C4.12513 20.7213 4.70478 20.975 5.71087 21.1103C6.73853 21.2484 8.0932 21.25 10 21.25H14C15.9068 21.25 17.2615 21.2484 18.2892 21.1103C19.2953 20.975 19.8749 20.7213 20.2981 20.2981C20.7213 19.8749 20.975 19.2953 21.1103 18.2892C21.2484 17.2615 21.25 15.9068 21.25 14V11.7979C21.25 10.4621 21.2486 9.5305 21.1597 8.82312C21.0731 8.13448 20.9141 7.76356 20.6729 7.49539C20.6198 7.43637 20.5637 7.3802 20.5046 7.32712C20.2365 7.08592 19.8656 6.92692 19.1769 6.84034C19.043 6.82351 18.9012 6.80982 18.75 6.79867V10.8528C18.75 10.9988 18.7504 11.1596 18.73 11.2966C18.7064 11.4556 18.6285 11.7812 18.2995 11.9845C17.9704 12.1879 17.6444 12.112 17.4916 12.062C17.36 12.0189 17.2162 11.9468 17.1105 11.8938L16 11.3385L14.8896 11.8938C14.7838 11.9468 14.6401 12.0189 14.5084 12.062C14.3556 12.112 14.0296 12.1879 13.7006 11.9845C13.3716 11.7812 13.2936 11.4556 13.27 11.2966C13.2497 11.1596 13.2499 10.9988 13.25 10.8805V6.53689C12.9367 6.43975 12.6343 6.31039 12.3475 6.15083C11.7663 5.82747 11.2885 5.3495 10.5476 4.60833L9.91943 3.98009C9.63616 3.69682 9.52778 3.58951 9.41731 3.49793C8.91403 3.08073 8.29664 2.825 7.64576 2.76413C7.50289 2.75077 7.35038 2.75002 6.94976 2.75002ZM14.75 6.74267V10.2865L15.4857 9.91864C15.5391 9.88975 15.7533 9.77362 16 9.77362C16.2468 9.77362 16.4609 9.88975 16.5068 9.9146L17.25 10.2865V6.75235C16.9308 6.75013 16.5829 6.75002 16.2021 6.75002H15.8284C15.3555 6.75011 15.0375 6.75017 14.75 6.74267Z" fill="#8b4a00"/></svg></span>
+          <div class="folder-info">
+            <div class="folder-name">${esc(f.name)}</div>
+            <div class="folder-count">${total} элем.</div>
+          </div>
+          <span class="chevron">›</span>
+        </div>`);
+      });
+    }
+    if (childFiles.length > 0) {
+      html.push('<div class="section-label">Тексты</div>');
+      childFiles.forEach(f => html.push(fileCardHtml(f)));
+    }
+  }
+  cont.innerHTML = html.join('');
+
+  cont.querySelectorAll('.folder-card').forEach(el => {
+    el.addEventListener('click', () => { state.folderStack.push(el.dataset.id); renderLibrary(); });
+    el.addEventListener('contextmenu', e => { e.preventDefault(); openFolderModal(el.dataset.id); });
+  });
+  cont.querySelectorAll('.file-card').forEach(el => {
+    el.addEventListener('click', () => { state.currentFileId = el.dataset.id; renderCover(); });
+    el.addEventListener('contextmenu', e => { e.preventDefault(); openFileModal(el.dataset.id); });
+  });
+}
+
+function fileCardHtml(f) {
+  const tags = (f.tags||[]).slice(0,4).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  const pairing = (f.pairing||'').trim();
+  const stripeColor = pairing === 'Слеш' ? '#227794' : pairing === 'Джен' ? '#9d6648' : pairing === 'Гет' ? '#3c9940' : '';
+  const stripe = stripeColor ? `style="border-left: 4px solid ${stripeColor}; padding-left: 12px;"` : '';
+  return `<div class="file-card" data-id="${f.id}" ${stripe}>
+    <div class="file-info">
+      <div class="file-name" style="display:flex;align-items:center;gap:5px;">${esc(f.name)}${f.favourite ? '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15"><path d="M3.41982 10.5H7.74973L11.2714 18.952C11.1342 18.8758 11.0064 18.7763 10.894 18.6537L3.41982 10.5Z" fill="#3A52EE"/><path d="M3.39844 9.00001L6.69868 5.03972C6.98367 4.69773 7.40584 4.5 7.85101 4.5H9.20917L7.70916 9.00001H3.39844Z" fill="#3A52EE"/><path d="M10.7903 4.5L9.2903 9.00001H14.7092L13.2092 4.5H10.7903Z" fill="#3A52EE"/><path d="M14.7903 4.5L16.2903 9.00001H20.601L17.3008 5.03972C17.0158 4.69773 16.5936 4.5 16.1485 4.5H14.7903Z" fill="#3A52EE"/><path d="M20.5796 10.5H16.2497L12.7281 18.952C12.8653 18.8758 12.993 18.7763 13.1055 18.6537L20.5796 10.5Z" fill="#3A52EE"/><path d="M11.9997 16.8L9.37473 10.5H14.6247L11.9997 16.8Z" fill="#3A52EE"/></svg>' : ''}</div>
+      ${f.author?`<div class="file-author">${esc(f.author)}</div>`:''}
+      ${f.desc?`<div class="file-desc">${esc(f.desc)}</div>`:''}
+      ${tags?`<div class="file-tags">${tags}</div>`:''}
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// RENDER COVER
+// ══════════════════════════════════════════════════
+function renderCover() {
+  showScreen('cover');
+  const file = DATA.files.find(f => f.id === state.currentFileId);
+  if (!file) return;
+  document.getElementById('cover-topbar-title').textContent = file.name;
+
+  const tags = (file.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  const header = `
+    <div class="cover-header">
+      <div class="cover-title">${esc(file.name)}</div>
+      ${file.author?`<div class="cover-author">${esc(file.author)}</div>`:''}
+      ${file.desc?`<div class="cover-desc">${esc(file.desc)}</div>`:''}
+      ${tags?`<div class="cover-tags">${tags}</div>`:''}
+    </div>`;
+
+  if (file.simple) {
+    // Simple text mode — just a big edit button
+    document.getElementById('cover-body').innerHTML = header + `
+      <button class="cover-edit-btn" id="cover-simple-edit">✏️ Редактировать текст</button>
+      ${file.simpleContent ? `
+        <div style="padding:20px 18px;font-family:var(--font-body);font-size:16px;line-height:1.75;color:#111;text-align:justify;">
+          ${renderContent(file.simpleContent)}
+        </div>` : ''}`;
+    document.getElementById('cover-simple-edit').addEventListener('click', () => openSimpleEditor(file.id));
+  } else {
+    // Chapters mode
+    const chapters = file.chapters || [];
+    const tocItems = chapters.map((ch,i) => `
+      <div class="toc-item" data-idx="${i}">
+        <div class="toc-num">${i+1}</div>
+        <div class="toc-item-title">${esc(ch.name)}</div>
+        <span style="color:var(--text2);font-size:14px;">›</span>
+      </div>`).join('');
+
+    document.getElementById('cover-body').innerHTML = header + `
+      <div class="toc-section">
+        <div class="toc-title">Оглавление · ${chapters.length} ${plural(chapters.length,'глава','главы','глав')}</div>
+        ${chapters.length === 0
+          ? `<div class="empty" style="padding:30px 0">
+               <div class="empty-icon" style="font-size:36px;">📝</div>
+               <div class="empty-title" style="font-size:16px;">Нет глав</div>
+               <div class="empty-sub">Нажмите ✏️ чтобы добавить первую главу</div>
+             </div>`
+          : tocItems}
+      </div>`;
+
+    document.querySelectorAll('.toc-item').forEach(el => {
+      el.addEventListener('click', () => openChapter(parseInt(el.dataset.idx)));
+      el.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        state.ctxTarget = parseInt(el.dataset.idx);
+        showCtx('ctx-toc', e.clientX, e.clientY);
+      });
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════
+// CHAPTER
+// ══════════════════════════════════════════════════
+function openChapter(idx) {
+  const file = DATA.files.find(f => f.id === state.currentFileId);
+  if (!file || !file.chapters[idx]) return;
+  state.currentChapterIdx = idx;
+  showScreen('chapter');
+  const ch = file.chapters[idx];
+  document.getElementById('chapter-topbar-title').textContent = ch.name;
+  document.getElementById('chapter-body').innerHTML = renderContent(ch.content || '');
+  document.getElementById('nav-prev').disabled = idx === 0;
+  document.getElementById('nav-next').disabled = idx === file.chapters.length - 1;
+}
+
+function renderContent(text) {
+  return text.split('\n').map(line => {
+    if (line.startsWith('# ')) return `<h1 style="font-size:1.5em;margin-bottom:.5em;">${esc(line.slice(2))}</h1>`;
+    if (line.startsWith('## ')) return `<h2 style="font-size:1.2em;margin-bottom:.5em;">${esc(line.slice(3))}</h2>`;
+    if (line === '---') return '<hr class="divider">';
+    if (line === '***') return '<hr class="divider-fancy">';
+    if (line.trim() === '') return '';
+    // handle justify [j]...[/j] and indent [i]
+    let justify = false;
+    let indent = false;
+    let l = line;
+    if (l.startsWith('[j]') && l.endsWith('[/j]')) { justify = true; l = l.slice(3, -4); }
+    if (l.startsWith('[i]')) { indent = true; l = l.slice(3); }
+    const style = [
+      justify ? 'text-align:justify;' : '',
+      indent  ? 'text-indent:1.8em;' : '',
+    ].join('');
+    const inner = esc(l).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/__(.+?)__/g,'<u>$1</u>');
+    return `<p${style ? ` style="${style}"` : ''}>${inner}</p>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// EDITOR
+// ══════════════════════════════════════════════════
+let editorMode = null; // 'chapter' | 'simple'
+
+function openChapterEditor(fileId, chapterIdx) {
+  state.editingChapterId = { fileId, chapterIdx };
+  editorMode = 'chapter';
+  const file = DATA.files.find(f => f.id === fileId);
+  const ch = (file.chapters||[])[chapterIdx];
+  document.getElementById('editor-title').textContent = ch ? 'Редактировать главу' : 'Новая глава';
+  document.getElementById('editor-area').value = ch ? (ch.content||'') : '';
+  showScreen('editor');
+}
+
+function openSimpleEditor(fileId) {
+  state.editingChapterId = { fileId, chapterIdx: -1 };
+  editorMode = 'simple';
+  const file = DATA.files.find(f => f.id === fileId);
+  document.getElementById('editor-title').textContent = 'Редактировать текст';
+  document.getElementById('editor-area').value = file.simpleContent || '';
+  showScreen('editor');
+}
+
+function insertAtCursor(ta, before, after='') {
+  const s=ta.selectionStart, e=ta.selectionEnd, sel=ta.value.slice(s,e);
+  ta.value = ta.value.slice(0,s)+before+sel+after+ta.value.slice(e);
+  ta.selectionStart = s+before.length;
+  ta.selectionEnd = s+before.length+sel.length;
+  ta.focus();
+}
+
+document.getElementById('tb-bold').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'**','**'));
+document.getElementById('tb-italic').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'*','*'));
+document.getElementById('tb-under').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'__','__'));
+document.getElementById('tb-div-line').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'\n---\n'));
+document.getElementById('tb-div-stars').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'\n***\n'));
+document.getElementById('tb-h1').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'# '));
+document.getElementById('tb-h2').addEventListener('click',()=>insertAtCursor(document.getElementById('editor-area'),'## '));
+
+// Justify: wraps selected/current paragraph in [j]...[/j] marker
+document.getElementById('tb-justify').addEventListener('click', () => {
+  const ta = document.getElementById('editor-area');
+  // find current line boundaries
+  const pos = ta.selectionStart;
+  const val = ta.value;
+  let lineStart = val.lastIndexOf('\n', pos - 1) + 1;
+  let lineEnd = val.indexOf('\n', pos);
+  if (lineEnd === -1) lineEnd = val.length;
+  const line = val.slice(lineStart, lineEnd);
+  // toggle [j] tag
+  if (line.startsWith('[j]') && line.endsWith('[/j]')) {
+    const inner = line.slice(3, -4);
+    ta.value = val.slice(0, lineStart) + inner + val.slice(lineEnd);
+  } else {
+    ta.value = val.slice(0, lineStart) + '[j]' + line + '[/j]' + val.slice(lineEnd);
+  }
+  ta.focus();
+  document.getElementById('tb-justify').classList.toggle('active',
+    ta.value.slice(lineStart).startsWith('[j]'));
+});
+
+// Indent: inserts [i] at start of paragraph
+document.getElementById('tb-indent').addEventListener('click', () => {
+  const ta = document.getElementById('editor-area');
+  const pos = ta.selectionStart;
+  const val = ta.value;
+  let lineStart = val.lastIndexOf('\n', pos - 1) + 1;
+  let lineEnd = val.indexOf('\n', pos);
+  if (lineEnd === -1) lineEnd = val.length;
+  const line = val.slice(lineStart, lineEnd);
+  if (line.startsWith('[i]')) {
+    ta.value = val.slice(0, lineStart) + line.slice(3) + val.slice(lineEnd);
+  } else {
+    ta.value = val.slice(0, lineStart) + '[i]' + line + val.slice(lineEnd);
+  }
+  ta.selectionStart = ta.selectionEnd = pos + (line.startsWith('[i]') ? -3 : 3);
+  ta.focus();
+});
+document.getElementById('tb-font').addEventListener('change',function(){document.getElementById('editor-area').style.fontFamily=this.value;});
+document.getElementById('tb-size').addEventListener('change',function(){document.getElementById('editor-area').style.fontSize=this.value+'px';});
+
+document.getElementById('btn-editor-save').addEventListener('click', () => {
+  const content = document.getElementById('editor-area').value;
+  const { fileId, chapterIdx } = state.editingChapterId;
+  const file = DATA.files.find(f => f.id === fileId);
+  if (editorMode === 'simple') {
+    file.simpleContent = content;
+  } else {
+    if (!file.chapters) file.chapters = [];
+    file.chapters[chapterIdx].content = content;
+  }
+  saveData();
+  toast('Сохранено ✓');
+  state.currentFileId = fileId;
+  renderCover();
+});
+
+document.getElementById('btn-editor-cancel').addEventListener('click', () => {
+  if (state.currentFileId) renderCover();
+  else renderLibrary();
+});
+
+// ══════════════════════════════════════════════════
+// MODAL: FOLDER
+// ══════════════════════════════════════════════════
+let selectedFolderIcon = '📁';
+
+function openFolderModal(folderId=null) {
+  state.editingFolderId = folderId;
+  const folder = folderId ? DATA.folders.find(f=>f.id===folderId) : null;
+  document.getElementById('modal-folder-title').textContent = folder ? 'Редактировать папку' : 'Новая папка';
+  document.getElementById('inp-folder-name').value = folder ? folder.name : '';
+  selectedFolderIcon = folder ? (folder.icon||'📁') : '📁';
+  document.getElementById('inp-folder-icon').value = folder ? (folder.icon||'') : '';
+  document.getElementById('btn-folder-delete').style.display = folderId ? 'block' : 'none';
+  document.getElementById('modal-folder').classList.add('open');
+}
+
+document.getElementById('folder-emoji-picker').querySelectorAll('span').forEach(s => {
+  s.addEventListener('click', () => { selectedFolderIcon = s.dataset.em; document.getElementById('inp-folder-icon').value = s.dataset.em; });
+});
+
+document.getElementById('btn-folder-save').addEventListener('click', () => {
+  const name = document.getElementById('inp-folder-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const icon = document.getElementById('inp-folder-icon').value.trim() || selectedFolderIcon;
+  if (state.editingFolderId) {
+    const f = DATA.folders.find(x=>x.id===state.editingFolderId);
+    f.name = name; f.icon = icon;
+    toast('Папка обновлена');
+  } else {
+    DATA.folders.push({ id: uid(), name, icon, parentId: currentFolderId(), createdAt: Date.now() });
+    toast('Папка создана');
+  }
+  saveData();
+  document.getElementById('modal-folder').classList.remove('open');
+  renderLibrary();
+});
+
+document.getElementById('btn-folder-delete').addEventListener('click', () => {
+  if (!confirm('Удалить папку и всё её содержимое?')) return;
+  // recursively delete
+  function deleteFolderRec(id) {
+    DATA.folders.filter(f=>f.parentId===id).forEach(f=>deleteFolderRec(f.id));
+    DATA.files = DATA.files.filter(f=>f.folderId!==id);
+    DATA.folders = DATA.folders.filter(f=>f.id!==id);
+  }
+  deleteFolderRec(state.editingFolderId);
+  saveData();
+  document.getElementById('modal-folder').classList.remove('open');
+  // if we were inside the deleted folder, go up
+  const idx = state.folderStack.indexOf(state.editingFolderId);
+  if (idx !== -1) state.folderStack = state.folderStack.slice(0, idx);
+  renderLibrary();
+  toast('Папка удалена');
+});
+
+document.getElementById('btn-folder-cancel').addEventListener('click', () => {
+  document.getElementById('modal-folder').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════
+// MODAL: FILE
+// ══════════════════════════════════════════════════
+function openFileModal(fileId=null) {
+  state.editingFileId = fileId;
+  const file = fileId ? DATA.files.find(f=>f.id===fileId) : null;
+  document.getElementById('modal-file-title').textContent = file ? 'Редактировать текст' : 'Новый текст';
+  document.getElementById('inp-file-name').value = file ? file.name : '';
+  document.getElementById('inp-file-author').value = file ? (file.author||'') : '';
+  document.getElementById('inp-file-desc').value = file ? (file.desc||'') : '';
+  document.getElementById('inp-file-tags').value = file ? (file.tags||[]).join(', ') : '';
+  document.getElementById('inp-file-pairing').value = file ? (file.pairing||'') : '';
+  document.getElementById('inp-file-simple').checked = file ? !!file.simple : false;
+  if(document.getElementById('inp-file-fav')) document.getElementById('inp-file-fav').checked = file ? !!file.favourite : false;
+  document.getElementById('btn-file-delete').style.display = fileId ? 'block' : 'none';
+  document.getElementById('modal-file').classList.add('open');
+}
+
+document.getElementById('btn-file-save').addEventListener('click', () => {
+  const name = document.getElementById('inp-file-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const author = document.getElementById('inp-file-author').value.trim();
+  const desc = document.getElementById('inp-file-desc').value.trim();
+  const tags = document.getElementById('inp-file-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const pairing = document.getElementById('inp-file-pairing').value;
+  const simple = document.getElementById('inp-file-simple').checked;
+  const favourite = document.getElementById('inp-file-fav') ? document.getElementById('inp-file-fav').checked : false;
+
+  if (state.editingFileId) {
+    const f = DATA.files.find(x=>x.id===state.editingFileId);
+    f.name=name; f.author=author; f.desc=desc; f.tags=tags; f.pairing=pairing; f.simple=simple; f.favourite=favourite;
+    saveData();
+    document.getElementById('modal-file').classList.remove('open');
+    if (state.currentFileId===state.editingFileId) renderCover();
+    else renderLibrary();
+    toast('Текст обновлён');
+  } else {
+    DATA.files.push({ id:uid(), name, author, desc, tags, pairing, simple, favourite, chapters:[], simpleContent:'', folderId: currentFolderId(), createdAt: Date.now() });
+    saveData();
+    document.getElementById('modal-file').classList.remove('open');
+    renderLibrary();
+    toast('Текст создан');
+  }
+});
+
+document.getElementById('btn-file-delete').addEventListener('click', () => {
+  if (!confirm('Удалить этот текст?')) return;
+  DATA.files = DATA.files.filter(f=>f.id!==state.editingFileId);
+  saveData();
+  document.getElementById('modal-file').classList.remove('open');
+  renderLibrary();
+  toast('Текст удалён');
+});
+
+document.getElementById('btn-file-cancel').addEventListener('click', () => {
+  document.getElementById('modal-file').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════
+// MODAL: CHAPTER
+// ══════════════════════════════════════════════════
+function openChapterModal(fileId, chapterIdx=-1) {
+  const file = DATA.files.find(f=>f.id===fileId);
+  const ch = chapterIdx===-1 ? null : (file.chapters||[])[chapterIdx];
+  state.editingChapterId = { fileId, chapterIdx };
+  document.getElementById('modal-chapter-title').textContent = ch ? 'Редактировать главу' : 'Новая глава';
+  document.getElementById('inp-chapter-name').value = ch ? ch.name : '';
+  document.getElementById('btn-chapter-delete').style.display = chapterIdx!==-1 ? 'block' : 'none';
+  document.getElementById('modal-chapter').classList.add('open');
+}
+
+document.getElementById('btn-chapter-save').addEventListener('click', () => {
+  const name = document.getElementById('inp-chapter-name').value.trim();
+  if (!name) { toast('Введите название'); return; }
+  const { fileId, chapterIdx } = state.editingChapterId;
+  const file = DATA.files.find(f=>f.id===fileId);
+  if (!file.chapters) file.chapters=[];
+  let targetIdx;
+  if (chapterIdx===-1) { file.chapters.push({ id:uid(), name, content:'' }); targetIdx=file.chapters.length-1; }
+  else { file.chapters[chapterIdx].name=name; targetIdx=chapterIdx; }
+  saveData();
+  document.getElementById('modal-chapter').classList.remove('open');
+  openChapterEditor(fileId, targetIdx);
+});
+
+document.getElementById('btn-chapter-delete').addEventListener('click', () => {
+  if (!confirm('Удалить эту главу?')) return;
+  const { fileId, chapterIdx } = state.editingChapterId;
+  const file = DATA.files.find(f=>f.id===fileId);
+  file.chapters.splice(chapterIdx, 1);
+  saveData();
+  document.getElementById('modal-chapter').classList.remove('open');
+  renderCover();
+  toast('Глава удалена');
+});
+
+document.getElementById('btn-chapter-cancel').addEventListener('click', () => {
+  document.getElementById('modal-chapter').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════
+// CONTEXT MENU
+// ══════════════════════════════════════════════════
+function showCtx(id, x, y) {
+  closeAllCtx();
+  const el = document.getElementById(id);
+  el.style.left = Math.min(x, window.innerWidth-200)+'px';
+  el.style.top = Math.min(y, window.innerHeight-120)+'px';
+  el.classList.add('open');
+}
+function closeAllCtx() { document.querySelectorAll('.ctx-menu').forEach(e=>e.classList.remove('open')); }
+document.addEventListener('click', ()=>closeAllCtx());
+
+document.getElementById('ctx-toc-edit').addEventListener('click', () => { closeAllCtx(); openChapterModal(state.currentFileId, state.ctxTarget); });
+document.getElementById('ctx-toc-delete').addEventListener('click', () => {
+  closeAllCtx();
+  if (!confirm('Удалить главу?')) return;
+  const file = DATA.files.find(f=>f.id===state.currentFileId);
+  file.chapters.splice(state.ctxTarget, 1);
+  saveData(); renderCover(); toast('Глава удалена');
+});
+
+// ══════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════
+document.getElementById('btn-cover-back').addEventListener('click', () => renderLibrary());
+
+document.getElementById('btn-cover-edit').addEventListener('click', () => {
+  const fileId = state.currentFileId;
+  const file = DATA.files.find(f=>f.id===fileId);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:700;display:flex;align-items:flex-end;';
+  const items = file.simple
+    ? `<div class="ctx-item" id="_edit-simple" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">✏️ Редактировать текст</div>`
+    : `<div class="ctx-item" id="_add-ch" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">➕ Добавить главу</div>`;
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 36px;border-top:1px solid var(--border);">
+    <div style="font-size:16px;font-weight:600;margin-bottom:16px;">Действия</div>
+    <div class="ctx-item" id="_edit-meta" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">✏️ Редактировать шапку</div>
+    ${items}
+    <div class="ctx-item" id="_move-file" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">📂 Переместить в папку</div>
+    <div class="ctx-item danger" id="_del-file" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;">🗑 Удалить текст</div>
+    <div class="ctx-item" id="_cancel" style="border-radius:10px;background:var(--bg3);color:var(--text2);">Отмена</div>
+  </div>`;
+  document.body.appendChild(overlay);
+  const rm = () => document.body.removeChild(overlay);
+  overlay.querySelector('#_edit-meta').onclick = () => { rm(); openFileModal(fileId); };
+  const addCh = overlay.querySelector('#_add-ch');
+  if (addCh) addCh.onclick = () => { rm(); openChapterModal(fileId); };
+  const editSimple = overlay.querySelector('#_edit-simple');
+  if (editSimple) editSimple.onclick = () => { rm(); openSimpleEditor(fileId); };
+  overlay.querySelector('#_move-file').onclick = () => { rm(); openMoveFileModal(fileId); };
+  overlay.querySelector('#_del-file').onclick = () => {
+    rm();
+    if (!confirm('Удалить этот текст?')) return;
+    DATA.files = DATA.files.filter(f=>f.id!==fileId);
+    saveData(); renderLibrary(); toast('Текст удалён');
+  };
+  overlay.querySelector('#_cancel').onclick = rm;
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) rm(); });
+});
+
+document.getElementById('btn-chapter-back').addEventListener('click', ()=>renderCover());
+document.getElementById('btn-chapter-edit').addEventListener('click', ()=>openChapterModal(state.currentFileId, state.currentChapterIdx));
+document.getElementById('nav-prev').addEventListener('click', ()=>{ if(state.currentChapterIdx>0) openChapter(state.currentChapterIdx-1); });
+document.getElementById('nav-next').addEventListener('click', ()=>{
+  const file=DATA.files.find(f=>f.id===state.currentFileId);
+  if(state.currentChapterIdx<file.chapters.length-1) openChapter(state.currentChapterIdx+1);
+});
+document.getElementById('nav-toc').addEventListener('click', ()=>renderCover());
+
+// ══════════════════════════════════════════════════
+// FAB
+// ══════════════════════════════════════════════════
+document.getElementById('fab-toggle').addEventListener('click', () => {
+  state.fabOpen = !state.fabOpen;
+  document.getElementById('fab-toggle').textContent = state.fabOpen ? '✕' : '＋';
+  const fid = currentFolderId();
+  document.getElementById('fab-new-subfolder').classList.toggle('visible', state.fabOpen && !!fid);
+  document.getElementById('fab-new-folder').classList.toggle('visible', state.fabOpen);
+  document.getElementById('fab-new-file').classList.toggle('visible', state.fabOpen);
+});
+
+document.getElementById('fab-new-folder').addEventListener('click', () => { closeFab(); openFolderModal(); });
+document.getElementById('fab-new-subfolder').addEventListener('click', () => { closeFab(); openFolderModal(); }); // parentId set via currentFolderId()
+document.getElementById('fab-new-file').addEventListener('click', () => { closeFab(); openFileModal(); });
+
+// ══════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════
+document.getElementById('btn-search').addEventListener('click', () => {
+  const q = prompt('Поиск по названию, автору, меткам:');
+  if (!q) return;
+  const low = q.toLowerCase();
+  const results = DATA.files.filter(f =>
+    f.name.toLowerCase().includes(low) ||
+    (f.author||'').toLowerCase().includes(low) ||
+    (f.tags||[]).some(t=>t.toLowerCase().includes(low))
+  );
+  if (results.length === 0) { toast('Ничего не найдено'); return; }
+  const cont = document.getElementById('library-content');
+  document.getElementById('breadcrumb-bar').innerHTML = `<span>Результаты поиска: «${esc(q)}»</span>`;
+  showScreen('library');
+  cont.innerHTML = results.map(f=>fileCardHtml(f)).join('');
+  cont.querySelectorAll('.file-card').forEach(el => {
+    el.addEventListener('click', ()=>{ state.currentFileId=el.dataset.id; renderCover(); });
+  });
+});
+
+// ══════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════
+document.getElementById('btn-settings').addEventListener('click', ()=>document.getElementById('modal-settings').classList.add('open'));
+document.getElementById('btn-settings-close').addEventListener('click', ()=>document.getElementById('modal-settings').classList.remove('open'));
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(DATA,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const now = new Date();
+  const stamp = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  const a = document.createElement('a');
+  a.href=url; a.download='Hikari Books_'+stamp+'.json'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Файл сохранён в Загрузки ✓');
+});
+
+document.getElementById('btn-import').addEventListener('click', ()=>document.getElementById('inp-import-file').click());
+document.getElementById('inp-import-file').addEventListener('change', function() {
+  const file = this.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.folders||!parsed.files) throw new Error();
+      if (!confirm('Загрузить резервную копию? Это заменит все текущие данные.')) return;
+      DATA=parsed; saveData();
+      document.getElementById('modal-settings').classList.remove('open');
+      renderLibrary(); toast('Данные восстановлены ✓');
+    } catch { toast('Ошибка: неверный файл'); }
+  };
+  reader.readAsText(file); this.value='';
+});
+
+document.getElementById('btn-clear-all').addEventListener('click', () => {
+  if (!confirm('Удалить ВСЕ данные? Это необратимо.')) return;
+  if (!confirm('Вы уверены?')) return;
+  DATA=defaultData(); saveData();
+  document.getElementById('modal-settings').classList.remove('open');
+  renderLibrary(); toast('Все данные удалены');
+});
+
+// ══════════════════════════════════════════════════
+// MOVE FILE TO FOLDER
+// ══════════════════════════════════════════════════
+function openMoveFileModal(fileId) {
+  const file = DATA.files.find(f => f.id === fileId);
+  if (!file) return;
+
+  // Build flat list of all folders with indentation
+  function collectFolders(parentId, depth) {
+    const result = [];
+    DATA.folders.filter(f => (f.parentId || null) === parentId).forEach(f => {
+      result.push({ id: f.id, name: f.name, icon: f.icon || '📁', depth });
+      result.push(...collectFolders(f.id, depth + 1));
+    });
+    return result;
+  }
+  const allFolders = collectFolders(null, 0);
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:700;display:flex;align-items:flex-end;';
+
+  const items = [
+    `<div class="ctx-item" data-folderid="" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;${!file.folderId ? 'border:1px solid var(--accent);' : ''}">
+      🏠 <span style="margin-left:4px;">Корневой список</span>
+      ${!file.folderId ? '<span style="margin-left:auto;color:var(--accent);font-size:12px;">сейчас здесь</span>' : ''}
+    </div>`
+  ];
+
+  allFolders.forEach(f => {
+    const isCurrent = file.folderId === f.id;
+    const indent = '　'.repeat(f.depth);
+    items.push(`<div class="ctx-item" data-folderid="${f.id}" style="border-radius:10px;background:var(--bg3);margin-bottom:8px;${isCurrent ? 'border:1px solid var(--accent);' : ''}">
+      ${indent}${f.icon} <span style="margin-left:4px;">${esc(f.name)}</span>
+      ${isCurrent ? '<span style="margin-left:auto;color:var(--accent);font-size:12px;">сейчас здесь</span>' : ''}
+    </div>`);
+  });
+
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 36px;border-top:1px solid var(--border);max-height:80dvh;overflow-y:auto;">
+    <div style="font-size:16px;font-weight:600;margin-bottom:4px;">📂 Переместить текст</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">«${esc(file.name)}»</div>
+    ${items.join('')}
+    <div class="ctx-item" id="_move-cancel" style="border-radius:10px;background:var(--bg3);color:var(--text2);margin-top:4px;">Отмена</div>
+  </div>`;
+
+  document.body.appendChild(overlay);
+  const rm = () => document.body.removeChild(overlay);
+
+  overlay.querySelectorAll('[data-folderid]').forEach(el => {
+    el.addEventListener('click', () => {
+      const targetId = el.dataset.folderid || null;
+      file.folderId = targetId;
+      saveData();
+      rm();
+      renderLibrary();
+      const targetName = targetId
+        ? (DATA.folders.find(f => f.id === targetId)?.name || 'папку')
+        : 'корневой список';
+      toast(`Перемещено в: ${targetName}`);
+    });
+  });
+
+  overlay.querySelector('#_move-cancel').addEventListener('click', rm);
+  overlay.addEventListener('click', e => { if (e.target === overlay) rm(); });
+}
+
+// ══════════════════════════════════════════════════
+// EPUB IMPORT
+// ══════════════════════════════════════════════════
+document.getElementById('btn-epub-import').addEventListener('click', () => {
+  document.getElementById('inp-epub-file').click();
+});
+
+document.getElementById('inp-epub-file').addEventListener('change', async function() {
+  const file = this.files[0];
+  if (!file) return;
+  const status = document.getElementById('epub-status');
+  status.textContent = 'Загрузка библиотеки…';
+
+  try {
+    // Load JSZip if not already loaded
+    if (typeof JSZip === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Не удалось загрузить библиотеку. Проверьте интернет.'));
+        document.head.appendChild(s);
+      });
+    }
+
+    status.textContent = 'Читаю файл…';
+    const arrayBuffer = await file.arrayBuffer();
+    const zip = await JSZip.loadAsync(arrayBuffer);
+
+    // Parse container.xml to find OPF file
+    const containerXml = await zip.file('META-INF/container.xml').async('text');
+    const parser = new DOMParser();
+    const containerDoc = parser.parseFromString(containerXml, 'application/xml');
+    const opfPath = containerDoc.querySelector('rootfile').getAttribute('full-path');
+    const opfDir = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1) : '';
+
+    // Parse OPF
+    status.textContent = 'Читаю структуру…';
+    const opfText = await zip.file(opfPath).async('text');
+    const opfDoc = parser.parseFromString(opfText, 'application/xml');
+
+    // Build spine manifest
+    const manifest = {};
+    opfDoc.querySelectorAll('manifest item').forEach(item => {
+      manifest[item.getAttribute('id')] = {
+        href: item.getAttribute('href'),
+        type: item.getAttribute('media-type'),
+      };
+    });
+
+    // Get spine order
+    const spineItems = [];
+    opfDoc.querySelectorAll('spine itemref').forEach(ref => {
+      const id = ref.getAttribute('idref');
+      if (manifest[id] && manifest[id].type === 'application/xhtml+xml') {
+        spineItems.push({ id, href: manifest[id].href });
+      }
+    });
+
+    // Try to read NCX or NAV for chapter names
+    const chapterNames = {};
+    // Try NCX
+    const ncxItem = Object.values(manifest).find(m => m.type === 'application/x-dtbncx+xml');
+    if (ncxItem) {
+      try {
+        const ncxPath = opfDir + ncxItem.href;
+        const ncxText = await zip.file(ncxPath).async('text');
+        const ncxDoc = parser.parseFromString(ncxText, 'application/xml');
+        ncxDoc.querySelectorAll('navPoint').forEach(np => {
+          const label = np.querySelector('navLabel text')?.textContent?.trim();
+          const src = np.querySelector('content')?.getAttribute('src')?.split('#')[0];
+          if (label && src) chapterNames[src] = label;
+        });
+      } catch(e) {}
+    }
+    // Try NAV (epub3)
+    const navItem = Object.values(manifest).find(m => m.type === 'application/xhtml+xml' && m.href.includes('nav'));
+    if (navItem) {
+      try {
+        const navPath = opfDir + navItem.href;
+        const navText = await zip.file(navPath).async('text');
+        const navDoc = parser.parseFromString(navText, 'application/xhtml+xml');
+        navDoc.querySelectorAll('nav[epub\:type="toc"] a, nav a').forEach(a => {
+          const href = a.getAttribute('href')?.split('#')[0];
+          const label = a.textContent?.trim();
+          if (href && label) chapterNames[href] = label;
+        });
+      } catch(e) {}
+    }
+
+    // Extract chapters
+    status.textContent = `Извлекаю главы…`;
+    const chapters = [];
+    let chapterNum = 0;
+
+    for (const item of spineItems) {
+      const filePath = opfDir + item.href;
+      const hrefBase = item.href.split('/').pop();
+      let fileText = '';
+      try {
+        fileText = await zip.file(filePath).async('text');
+      } catch(e) {
+        try { fileText = await zip.file(item.href).async('text'); } catch(e2) { continue; }
+      }
+
+      // Parse HTML
+      const doc = parser.parseFromString(fileText, 'application/xhtml+xml');
+      // Remove script/style tags
+      doc.querySelectorAll('script,style').forEach(el => el.remove());
+
+      const bodyEl = doc.querySelector('body');
+      if (!bodyEl) continue;
+
+      // Extract text preserving paragraph structure
+      let chapterText = '';
+      function processNode(node) {
+        if (node.nodeType === 3) { // text node
+          const t = node.textContent.replace(/\s+/g, ' ');
+          if (t.trim()) chapterText += t;
+        } else if (node.nodeType === 1) {
+          const tag = node.tagName.toLowerCase();
+          if (['p','div','br','li'].includes(tag) && chapterText && !chapterText.endsWith('\n')) {
+            chapterText += '\n';
+          }
+          if (['h1','h2','h3','h4'].includes(tag)) {
+            chapterText += '\n# ';
+            node.childNodes.forEach(processNode);
+            chapterText += '\n';
+            return;
+          }
+          node.childNodes.forEach(processNode);
+          if (['p','div','li'].includes(tag)) chapterText += '\n';
+        }
+      }
+      processNode(bodyEl);
+
+      // Clean up text
+      chapterText = chapterText
+        .replace(/[ \t]+/g, ' ')
+        .replace(/\n[ \t]+/g, '\n')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      if (chapterText.length < 20) continue; // skip near-empty pages
+
+      chapterNum++;
+      // Find chapter name
+      const name = chapterNames[hrefBase]
+        || chapterNames[item.href]
+        || `Глава ${chapterNum}`;
+
+      chapters.push({ id: uid(), name, content: chapterText });
+    }
+
+    if (chapters.length === 0) {
+      status.textContent = 'Не удалось извлечь главы из файла.';
+      return;
+    }
+
+    // Create file entry (blank header — user fills manually)
+    const epubFileName = file.name.replace(/\.epub$/i, '');
+    const newFile = {
+      id: uid(),
+      name: epubFileName,
+      author: '',
+      desc: '',
+      tags: [],
+      simple: false,
+      chapters,
+      folderId: null,
+    };
+    DATA.files.push(newFile);
+    saveData();
+
+    status.textContent = '';
+    document.getElementById('modal-settings').classList.remove('open');
+    state.currentFileId = newFile.id;
+    renderLibrary();
+    // Open cover so user can fill in the header
+    setTimeout(() => {
+      state.currentFileId = newFile.id;
+      renderCover();
+      toast(`Импортировано ${chapters.length} глав ✓`);
+    }, 100);
+
+  } catch(err) {
+    console.error(err);
+    status.textContent = 'Ошибка: ' + err.message;
+  }
+  this.value = '';
+});
+
+// ══════════════════════════════════════════════════
+// PWA SERVICE WORKER
+// ══════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ══════════════════════════════════════════════════
+// GITHUB SYNC
+// ══════════════════════════════════════════════════
+const GITHUB_CONFIG_KEY = 'hikari_github_config';
+
+function getGithubConfig() {
+  try { return JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveGithubConfig(cfg) {
+  localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(cfg));
+}
+
+async function githubSyncSave() {
+  const cfg = getGithubConfig();
+  if (!cfg.token || !cfg.repo) { toast('GitHub не настроен'); return; }
+  toast('Сохраняю в GitHub…');
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
+    const path = cfg.path || 'data.json';
+    const apiUrl = `https://api.github.com/repos/${cfg.repo}/contents/${path}`;
+
+    // Get current SHA if file exists
+    let sha = null;
+    const getResp = await fetch(apiUrl, {
+      headers: { 'Authorization': `token ${cfg.token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (getResp.ok) {
+      const existing = await getResp.json();
+      sha = existing.sha;
+    }
+
+    const body = { message: 'sync: ' + new Date().toLocaleString('ru'), content };
+    if (sha) body.sha = sha;
+
+    const putResp = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${cfg.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    if (!putResp.ok) throw new Error(await putResp.text());
+    toast('Сохранено в GitHub ✓');
+  } catch(e) {
+    console.error(e);
+    toast('Ошибка GitHub: ' + e.message);
+  }
+}
+
+async function githubSyncLoad() {
+  const cfg = getGithubConfig();
+  if (!cfg.token || !cfg.repo) { toast('GitHub не настроен'); return; }
+  toast('Загружаю из GitHub…');
+  try {
+    const path = cfg.path || 'data.json';
+    const apiUrl = `https://api.github.com/repos/${cfg.repo}/contents/${path}`;
+    const resp = await fetch(apiUrl, {
+      headers: { 'Authorization': `token ${cfg.token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!resp.ok) throw new Error('Файл не найден в репозитории');
+    const json = await resp.json();
+    const decoded = decodeURIComponent(escape(atob(json.content.replace(/\n/g,''))));
+    const parsed = JSON.parse(decoded);
+    if (!parsed.folders || !parsed.files) throw new Error('Неверный формат');
+    if (!confirm('Загрузить данные из GitHub? Локальные данные будут заменены.')) return;
+    DATA = parsed;
+    saveData();
+    renderLibrary();
+    toast('Данные загружены из GitHub ✓');
+  } catch(e) {
+    console.error(e);
+    toast('Ошибка GitHub: ' + e.message);
+  }
+}
+
+function openGithubSettings() {
+  const cfg = getGithubConfig();
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:800;display:flex;align-items:flex-end;';
+  overlay.innerHTML = `
+    <div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 36px;border-top:1px solid var(--border);max-height:90dvh;overflow-y:auto;">
+      <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:6px;">🔗 GitHub Sync</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6;">
+        Данные хранятся в приватном репозитории.<br>
+        Токен нужен с правом <code style="background:var(--bg3);padding:1px 5px;border-radius:4px;">repo</code>.
+      </div>
+      <div class="field">
+        <label>GitHub Token</label>
+        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxx" value="${cfg.token||''}">
+      </div>
+      <div class="field">
+        <label>Репозиторий (user/repo)</label>
+        <input type="text" id="gh-repo" placeholder="username/hikari-books-data" value="${cfg.repo||''}">
+      </div>
+      <div class="field">
+        <label>Путь к файлу</label>
+        <input type="text" id="gh-path" placeholder="data.json" value="${cfg.path||'data.json'}">
+      </div>
+      <button class="btn btn-primary" id="gh-save-cfg">💾 Сохранить настройки</button>
+      <button class="btn btn-secondary" id="gh-cancel" style="margin-top:10px;">Отмена</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  const rm = () => document.body.removeChild(overlay);
+  overlay.querySelector('#gh-save-cfg').onclick = () => {
+    const token = overlay.querySelector('#gh-token').value.trim();
+    const repo = overlay.querySelector('#gh-repo').value.trim();
+    const path = overlay.querySelector('#gh-path').value.trim() || 'data.json';
+    if (!token || !repo) { toast('Заполните токен и репозиторий'); return; }
+    saveGithubConfig({ token, repo, path });
+    toast('Настройки GitHub сохранены ✓');
+    rm();
+  };
+  overlay.querySelector('#gh-cancel').onclick = rm;
+  overlay.addEventListener('click', e => { if(e.target===overlay) rm(); });
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+initSortBar();
+renderLibrary();
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW зарегистрирован'))
+      .catch(err => console.log('SW ошибка:', err));
+  });
+}
+</script>
+</body>
+</html>
