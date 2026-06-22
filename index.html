@@ -440,23 +440,8 @@
 <button class="btn btn-secondary" id="btn-github-settings">🔗 Настроить GitHub</button>
 <button class="btn btn-secondary" id="btn-github-save" style="margin-top:10px;">☁️ Сохранить в GitHub</button>
 <button class="btn btn-secondary" id="btn-github-load" style="margin-top:10px;">⬇️ Загрузить из GitHub</button>
-    </div>
     <div style="border-top:1px solid var(--border);margin:20px 0 16px;"></div>
     <button class="btn btn-danger" id="btn-clear-all">🗑 Удалить все данные</button>
- <script>
-  document.getElementById('btn-github-settings').addEventListener('click', () => {
-    document.getElementById('modal-settings').classList.remove('open');
-    openGithubSettings();
-  });
-  document.getElementById('btn-github-save').addEventListener('click', () => {
-    document.getElementById('modal-settings').classList.remove('open');
-    githubSyncSave();
-  });
-  document.getElementById('btn-github-load').addEventListener('click', () => {
-    document.getElementById('modal-settings').classList.remove('open');
-    githubSyncLoad();
-  });
-</script>
      <button class="btn btn-secondary" id="btn-settings-close" style="margin-top:10px;">Закрыть</button>
   </div>
 </div>
@@ -1599,6 +1584,20 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('SW ошибка:', err));
   });
 }
+ 
+  // GitHub кнопки
+document.getElementById('btn-github-settings').addEventListener('click', () => {
+  document.getElementById('modal-settings').classList.remove('open');
+  openGithubSettings();
+});
+document.getElementById('btn-github-save').addEventListener('click', () => {
+  document.getElementById('modal-settings').classList.remove('open');
+  githubSyncSave();
+});
+document.getElementById('btn-github-load').addEventListener('click', () => {
+  document.getElementById('modal-settings').classList.remove('open');
+  githubSyncLoad();
+});
 </script>
 </body>
 </html>
